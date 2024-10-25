@@ -1,0 +1,17 @@
+apiVersion: v2
+name: pomerium-zero
+description: A Helm chart for deploying Pomerium Zero
+type: application
+version: 0.1.0
+appVersion: "v0.27.2"
+home: https://www.pomerium.com/
+sources:
+  - https://github.com/pomerium/pomerium
+maintainers:
+  - name: Pomerium Team
+    email: info@pomerium.com
+keywords:
+  - pomerium
+  - zero
+  - identity-aware proxy
+  - access proxy
