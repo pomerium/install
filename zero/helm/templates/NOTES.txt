@@ -1,0 +1,26 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+1. Important Notes:
+   - The 'pomeriumZeroToken' is required for this chart. Ensure it's set in your values.yaml file or provided via the --set flag during installation or upgrade.
+   - If 'pomeriumZeroToken' is not set, the installation or upgrade will fail.
+
+2. Verify the deployment:
+   kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "pomerium-zero.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+3. Access Pomerium Zero:
+   To access Pomerium Zero, run the following command to set up port forwarding:
+
+   kubectl --namespace {{ .Release.Namespace }} port-forward svc/{{ include "pomerium-zero.fullname" . }} 8443:443
+
+   Then, you can access Pomerium Zero at: https://localhost:8443
+
+   Note: Keep the port-forward command running while you're accessing Pomerium Zero.
+
+4. Learn more about the release:
+   helm status {{ .Release.Name }}
+   helm get all {{ .Release.Name }}
+
+5. For more information on configuring Pomerium Zero, visit:
+   https://www.pomerium.com/docs/

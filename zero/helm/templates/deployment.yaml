@@ -1,0 +1,41 @@
+{{- include "pomerium-zero.validateValues" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "pomerium-zero.fullname" . }}
+  labels:
+    {{- include "pomerium-zero.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "pomerium-zero.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "pomerium-zero.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: POMERIUM_ZERO_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "pomerium-zero.fullname" . }}-token
+                  key: pomerium_zero_token
+            - name: XDG_CACHE_HOME
+              value: /var/cache
+          ports:
+            - name: https
+              containerPort: 443
+              protocol: TCP
+          volumeMounts:
+            - name: cache
+              mountPath: /var/cache
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: cache
+          emptyDir: {}
