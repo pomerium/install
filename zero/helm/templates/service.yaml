@@ -6,10 +6,11 @@ metadata:
     {{- include "pomerium-zero.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  selector:
+    {{- include "pomerium-zero.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: https
       protocol: TCP
       name: https
-  selector:
-    {{- include "pomerium-zero.selectorLabels" . | nindent 4 }}
+  externalTrafficPolicy: Local

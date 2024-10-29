@@ -14,7 +14,14 @@ spec:
     metadata:
       labels:
         {{- include "pomerium-zero.selectorLabels" . | nindent 8 }}
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
+      serviceAccountName: pomerium-zero
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -23,19 +30,110 @@ spec:
             - name: POMERIUM_ZERO_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "pomerium-zero.fullname" . }}-token
+                  name: {{ include "pomerium-zero.fullname" . }}
                   key: pomerium_zero_token
+            - name: POMERIUM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: BOOTSTRAP_CONFIG_FILE
+              value: "/var/run/secrets/pomerium/bootstrap.dat"
+            - name: BOOTSTRAP_CONFIG_WRITEBACK_URI
+              value: "secret://$(POMERIUM_NAMESPACE)/{{ include "pomerium-zero.fullname" . }}/bootstrap"
             - name: XDG_CACHE_HOME
-              value: /var/cache
+              value: /tmp/pomerium/cache
+            - name: XDG_DATA_HOME
+              value: /tmp/pomerium/cache
+            {{- with .Values.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
-            - name: https
-              containerPort: 443
+            - containerPort: 443
+              name: https
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
               protocol: TCP
           volumeMounts:
-            - name: cache
-              mountPath: /var/cache
+            - name: tmp
+              mountPath: /tmp
+            - name: bootstrap
+              mountPath: /var/run/secrets/pomerium
+              readOnly: true
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: https
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 60
+        {{- with .Values.extraContainers }}
+        {{ toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.initContainers }}
+      initContainers:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podDisruptionBudget }}
+      podDisruptionBudget:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- end }}
+      {{- if .Values.runtimeClassName }}
+      runtimeClassName: {{ .Values.runtimeClassName | quote }}
+      {{- end }}
       volumes:
-        - name: cache
+        - name: tmp
           emptyDir: {}
+        - name: bootstrap
+          secret:
+            items:
+            - key: bootstrap
+              path: bootstrap.dat
+            optional: true
+            secretName: {{ include "pomerium-zero.fullname" . }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
