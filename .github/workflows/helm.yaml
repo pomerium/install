@@ -1,0 +1,23 @@
+name: Publish Helm Chart
+on:
+  release:
+    types:
+      - published
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+      - name: Install Helm CLI
+        run: |
+          curl -fsSL https://git.io/get_helm.sh | bash
+      - name: Login
+        run: |
+          helm registry login registry-1.docker.io --username="${{ secrets.DOCKERHUB_USER }}" --password="${{ secrets.DOCKERHUB_TOKEN }} "
+      - name: Package Chart
+        run: |
+          helm package ./zero/helm
+      - name: Push Chart
+        run: |
+          find ./zero/helm -type f -name "*.tgz" -exec helm push {} oci://registry-1.docker.io/pomerium \;
