@@ -2,7 +2,7 @@ resource "kubernetes_deployment" "pomerium" {
   metadata {
     name      = var.deployment_name
     namespace = var.namespace_name
-    labels    = var.deployment_labels
+    labels    = local.deployment_labels
   }
 
   depends_on = [
@@ -19,16 +19,12 @@ resource "kubernetes_deployment" "pomerium" {
     replicas = var.deployment_replicas
 
     selector {
-      match_labels = {
-        "app.kubernetes.io/name" = "pomerium-ingress-controller"
-      }
+      match_labels = local.pod_labels
     }
 
     template {
       metadata {
-        labels = {
-          "app.kubernetes.io/name" = "pomerium-ingress-controller"
-        }
+        labels = local.pod_labels
       }
 
       spec {

@@ -18,6 +18,12 @@ variable "labels" {
   }
 }
 
+variable "pod_labels" {
+  description = "Labels to apply to pods"
+  type        = map(string)
+  default     = {}
+}
+
 variable "image_repository" {
   description = "Container image repository"
   type        = string
@@ -27,7 +33,7 @@ variable "image_repository" {
 variable "image_tag" {
   description = "Container image tag"
   type        = string
-  default     = "v0.27.0"
+  default     = "v0.27.2"
 }
 
 variable "image_pull_policy" {
