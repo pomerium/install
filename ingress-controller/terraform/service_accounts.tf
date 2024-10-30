@@ -6,10 +6,3 @@ resource "kubernetes_service_account" "controller" {
   }
 }
 
-resource "kubernetes_service_account" "gen_secrets" {
-  metadata {
-    name      = var.gen_secrets_service_account_name
-    namespace = var.namespace_name
-    labels    = var.service_account_labels
-  }
-}
