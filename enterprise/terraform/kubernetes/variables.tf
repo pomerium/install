@@ -4,6 +4,12 @@ variable "namespace_name" {
   default     = "pomerium-enterprise"
 }
 
+variable "use_external_namespace" {
+  description = "Skip creating the namespace, assume it already exists, and use the provided namespace name"
+  type        = bool
+  default     = false
+}
+
 variable "image_name" {
   description = "Container image name"
   type        = string
