@@ -46,16 +46,3 @@ resource "kubernetes_cluster_role" "controller" {
     verbs      = ["create", "patch"]
   }
 }
-
-resource "kubernetes_cluster_role" "gen_secrets" {
-  metadata {
-    name   = var.gen_secrets_cluster_role_name
-    labels = var.cluster_role_labels
-  }
-
-  rule {
-    api_groups = [""]
-    resources  = ["secrets"]
-    verbs      = ["create"]
-  }
-}

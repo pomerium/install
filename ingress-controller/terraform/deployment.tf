@@ -5,6 +5,10 @@ resource "kubernetes_deployment" "pomerium" {
     labels    = var.deployment_labels
   }
 
+  depends_on = [
+    kubernetes_secret.bootstrap
+  ]
+
   lifecycle {
     ignore_changes = [
       metadata[0].annotations

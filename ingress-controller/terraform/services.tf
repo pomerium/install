@@ -48,7 +48,7 @@ resource "kubernetes_service" "databroker" {
 
   metadata {
     name      = "pomerium-databroker"
-    namespace = kubernetes_namespace.pomerium.metadata[0].name
+    namespace = var.namespace_name
     labels    = var.service_labels
   }
 
