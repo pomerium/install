@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 0.13"
   required_providers {
     tls = {
       source  = "hashicorp/tls"
@@ -13,6 +14,11 @@ terraform {
     random = {
       source  = "hashicorp/random"
       version = "~> 3.0"
+    }
+
+    kubectl = {
+      source  = "gavinbunney/kubectl"
+      version = ">= 1.7.0"
     }
   }
 }

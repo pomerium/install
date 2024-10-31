@@ -1,3 +1,4 @@
-resource "kubernetes_manifest" "pomerium_crd" {
-  manifest = yamldecode(file("${path.module}/crd.yaml"))
+resource "kubectl_manifest" "pomerium_crd" {
+  yaml_body = file("${path.module}/crd.yaml")
 }
+

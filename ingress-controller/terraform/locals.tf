@@ -3,6 +3,8 @@ locals {
     "kubernetes.io/os" = "linux"
   }
 
+  node_selector = merge(local.default_node_selector, var.node_selector)
+
   secrets_name = "bootstrap"
 
   default_labels = {

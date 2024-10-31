@@ -1,3 +1,4 @@
+# Installation Customization
 variable "namespace_name" {
   description = "The name of the namespace to create"
   type        = string
@@ -204,4 +205,22 @@ variable "node_selector" {
   description = "Node selector for the Deployment"
   type        = map(string)
   default     = {}
+}
+
+# Configuration Customization
+variable "access_log_fields" {
+  description = "Access log fields"
+  type        = list(string)
+  default     = null
+}
+
+variable "idp_azure" {
+  description = "Microsoft EntraID (Azure AD)"
+  type = object({
+    client_id     = string
+    client_secret = string
+    tenant_id     = string
+  })
+  sensitive = true
+  default   = null
 }
