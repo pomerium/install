@@ -207,20 +207,48 @@ variable "node_selector" {
   default     = {}
 }
 
-# Configuration Customization
-variable "access_log_fields" {
-  description = "Access log fields"
-  type        = list(string)
-  default     = null
-}
-
-variable "idp_azure" {
-  description = "Microsoft EntraID (Azure AD)"
+variable "config" {
+  description = "Pomerium configuration. Set to null to disable config creation. See https://www.pomerium.com/docs/k8s/reference"
   type = object({
-    client_id     = string
-    client_secret = string
-    tenant_id     = string
+    accessLogFields = optional(list(string))
+    authenticate = optional(object({
+      callbackPath = optional(string)
+      url          = string
+    }))
+    caSecrets    = optional(list(string))
+    certificates = optional(list(string))
+    cookie = optional(object({
+      domain   = optional(string)
+      expire   = optional(string)
+      httpOnly = optional(bool)
+      name     = optional(string)
+      sameSite = optional(string)
+    }))
+    identity_provider = optional(object({
+      provider            = string
+      requestParams       = optional(map(string))
+      requestParamsSecret = optional(string)
+      scopes              = optional(list(string))
+      secret              = string
+      url                 = optional(string)
+    }))
+    jwtClaimsHeaders            = optional(map(string))
+    passIdentityHeaders         = optional(bool)
+    programmaticRedirectDomains = optional(string)
+    runtimeFlags                = optional(map(bool))
+    storage = optional(object({
+      postgres = object({
+        caSecret  = optional(string)
+        secret    = string
+        tlsSecret = optional(string)
+      })
+    }))
+    timeouts = optional(object({
+      idle  = optional(string)
+      read  = optional(string)
+      write = optional(string)
+    }))
+    useProxyProtocol = optional(bool)
   })
-  sensitive = true
-  default   = null
+  default = {}
 }

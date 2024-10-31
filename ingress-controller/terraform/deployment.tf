@@ -11,7 +11,12 @@ resource "kubernetes_deployment" "pomerium" {
 
   lifecycle {
     ignore_changes = [
-      metadata[0].annotations
+      metadata[0].annotations,
+      spec[0].template[0].metadata[0].annotations,
+      spec[0].template[0].spec[0].container[0].resources,
+      spec[0].template[0].spec[0].container[0].security_context,
+      spec[0].template[0].spec[0].toleration,
+      spec[0].template[0].spec[0].security_context,
     ]
   }
 
