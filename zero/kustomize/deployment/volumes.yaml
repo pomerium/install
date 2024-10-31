@@ -24,7 +24,8 @@ spec:
               readOnly: true
       volumes:
         - name: tmp
-          emptyDir: {}
+          emptyDir:
+            sizeLimit: 500Mi
         - name: bootstrap
           secret:
             optional: true
