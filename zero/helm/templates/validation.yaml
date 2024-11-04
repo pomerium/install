@@ -1,0 +1,1 @@
+{{- include "pomerium-zero.validateValues" . -}}
