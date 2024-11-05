@@ -87,7 +87,7 @@ resource "kubernetes_deployment" "pomerium-console" {
 
           env {
             name  = "AUDIENCE"
-            value = join(",", var.audience)
+            value = join(",", local.audience)
           }
 
           env {
@@ -104,7 +104,7 @@ resource "kubernetes_deployment" "pomerium-console" {
             name = "SHARED_SECRET"
             value_from {
               secret_key_ref {
-                name = var.secrets_name
+                name = local.secrets_name
                 key  = "shared_secret_b64"
               }
             }
@@ -114,7 +114,7 @@ resource "kubernetes_deployment" "pomerium-console" {
             name = "SIGNING_KEY"
             value_from {
               secret_key_ref {
-                name = var.secrets_name
+                name = local.secrets_name
                 key  = "signing_key_b64"
               }
             }
@@ -124,7 +124,7 @@ resource "kubernetes_deployment" "pomerium-console" {
             name = "DATABASE_URL"
             value_from {
               secret_key_ref {
-                name     = var.secrets_name
+                name     = local.secrets_name
                 key      = "database_url"
                 optional = false
               }
@@ -135,7 +135,7 @@ resource "kubernetes_deployment" "pomerium-console" {
             name = "DATABASE_ENCRYPTION_KEY"
             value_from {
               secret_key_ref {
-                name     = var.secrets_name
+                name     = local.secrets_name
                 key      = "database_encryption_key_b64"
                 optional = false
               }
@@ -146,7 +146,7 @@ resource "kubernetes_deployment" "pomerium-console" {
             name = "LICENSE_KEY"
             value_from {
               secret_key_ref {
-                name     = var.secrets_name
+                name     = local.secrets_name
                 key      = "license_key"
                 optional = false
               }

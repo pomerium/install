@@ -1,4 +1,4 @@
-resource "kubernetes_service" "proxy" {
+resource "kubernetes_service" "console" {
   metadata {
     name      = "pomerium-console"
     namespace = var.namespace_name

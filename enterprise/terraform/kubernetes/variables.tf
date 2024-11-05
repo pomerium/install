@@ -64,12 +64,9 @@ variable "tolerations" {
 }
 
 variable "audience" {
-  description = "List of audiences"
+  description = "List of audiences. By default would be derived from the ingress DNS names."
   type        = list(string)
-  validation {
-    condition     = length(var.audience) >= 1
-    error_message = "Audience must be provided"
-  }
+  default     = []
 }
 
 variable "administrators" {
@@ -84,32 +81,9 @@ variable "core_namespace_name" {
   default     = "pomerium-ingress-controller"
 }
 
-variable "authenticate_service_url" {
-  description = "The URL of the authenticate service"
-  type        = string
-}
-
-variable "shared_secret_b64" {
-  description = "Shared secret between the core and console, Base64 encoded binary data"
-  type        = string
-  sensitive   = true
-}
-
-variable "signing_key_b64" {
-  description = "PEM encoded signing key for the console, Base64 encoded"
-  type        = string
-  sensitive   = true
-}
-
 variable "database_url" {
   description = "Postgres database DSN string, may be either URL or key-value format"
   type        = string
-}
-
-variable "database_encryption_key_b64" {
-  description = "Key used to encrypt database data"
-  type        = string
-  sensitive   = true
 }
 
 variable "license_key" {
@@ -117,13 +91,6 @@ variable "license_key" {
   type        = string
   sensitive   = true
 }
-
-variable "secrets_name" {
-  description = "Name of the secrets"
-  type        = string
-  default     = "enterprise"
-}
-
 
 variable "resources_requests" {
   description = "Resource requests for the container"
@@ -194,4 +161,34 @@ variable "license_key_validate_offline" {
   description = "Whether to validate the license key offline. Can only be used with a valid offline license key."
   type        = bool
   default     = false
+}
+
+variable "console_ingress" {
+  description = "Console Ingress configuration. Set to null to disable."
+  type = object({
+    dns         = string
+    annotations = map(string)
+  })
+}
+
+variable "console_api_ingress" {
+  description = "Console API Ingress configuration. Annotations should contain the Pomerium policy. Set to null to disable."
+  type = object({
+    dns         = string
+    annotations = map(string)
+  })
+}
+
+variable "ingress_class_name" {
+  description = "Name of the Ingress class"
+  type        = string
+  default     = "pomerium"
+}
+
+variable "bootstrap_secret" {
+  description = "Reference to the core bootstrap secret to copy shared secrets from"
+  type = object({
+    name      = string
+    namespace = string
+  })
 }
