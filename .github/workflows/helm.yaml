@@ -20,4 +20,4 @@ jobs:
           helm package ./zero/helm
       - name: Push Chart
         run: |
-          find ./zero/helm -type f -name "*.tgz" -exec helm push {} oci://registry-1.docker.io/pomerium \;
+          find . -maxdepth 1 -type f -name "pomerium-zero-*.tgz" -exec helm push {} oci://registry-1.docker.io/pomerium \;
