@@ -14,7 +14,7 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
       - name: Login
         run: |
-          helm registry login registry-1.docker.io --username="${{ secrets.DOCKERHUB_USER }}" --password="${{ secrets.DOCKERHUB_SECRET_1124 }} "
+          helm registry login registry-1.docker.io --username="${{ secrets.DOCKERHUB_USER }}" --password="${{ secrets.DOCKERHUB_SECRET_1124 }}"
       - name: Package Chart
         run: |
           helm package ./zero/helm
