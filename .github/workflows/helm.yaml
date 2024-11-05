@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v1
       - name: Install Helm CLI
         run: |
-          curl -fsSL https://git.io/get_helm.sh | bash
+          curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
       - name: Login
         run: |
           helm registry login registry-1.docker.io --username="${{ secrets.DOCKERHUB_USER }}" --password="${{ secrets.DOCKERHUB_TOKEN }} "
