@@ -1,0 +1,17 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+1. Important Notes:
+   - The 'pomeriumZeroToken' is required for this chart. Ensure it's set in your values.yaml file or provided via the --set flag during installation.
+   - If 'pomeriumZeroToken' is not set, the installation will fail.
+
+2. Verify the deployment:
+   kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "pomerium-zero.name" . }},app.kubernetes.io/instance={{ .Release.Name }}"
+
+4. Learn more about the release:
+   helm status {{ .Release.Name }}
+   helm get all {{ .Release.Name }}
+
+5. For more information on configuring Pomerium Zero, visit:
+   https://www.pomerium.com/docs/

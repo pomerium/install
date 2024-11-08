@@ -1,0 +1,75 @@
+# Default values for pomerium-zero Helm chart
+
+# Required: Your Pomerium Zero token
+pomeriumZeroToken: "REPLACE_ME_WITH_YOUR_TOKEN"
+
+image:
+  repository: pomerium/pomerium
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+replicaCount: 1
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+service:
+  type: LoadBalancer
+  port: 443
+
+# Optional deployment settings
+#
+extraEnvVars: {}
+extraVolumes: {}
+extraVolumeMounts: {}
+extraContainers: {}
+podAnnotations: {}
+initContainers: {}
+
+# Security context settings
+#
+# https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
+podSecurityContext:
+  runAsNonRoot: true
+  runAsGroup: 65532
+  runAsUser: 65532
+# https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+
+# Priority and disruption settings
+#
+# https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass
+priorityClassName: ""
+# https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+tolerations: {}
+# https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets
+podDisruptionBudget: {}
+
+# Node affinity settings
+#
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: {}
+# https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
+nodeSelector:
+  kubernetes.io/os: linux
+
+# Runtime class name
+# https://kubernetes.io/docs/concepts/containers/runtime-class/
+runtimeClassName: ""
