@@ -252,3 +252,15 @@ variable "config" {
   })
   default = {}
 }
+
+variable "rolling_update" {
+  description = "Rolling update configuration"
+  type = object({
+    max_surge       = optional(string)
+    max_unavailable = optional(string)
+  })
+  default = {
+    max_surge       = "25%"
+    max_unavailable = "25%"
+  }
+}
