@@ -224,7 +224,7 @@ variable "config" {
       name     = optional(string)
       sameSite = optional(string)
     }))
-    identity_provider = optional(object({
+    identityProvider = optional(object({
       provider            = string
       requestParams       = optional(map(string))
       requestParamsSecret = optional(string)
