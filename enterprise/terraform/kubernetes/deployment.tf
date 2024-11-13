@@ -7,7 +7,8 @@ resource "kubernetes_deployment" "pomerium-console" {
   depends_on = [
     kubernetes_namespace.pomerium-enterprise,
     kubernetes_secret.console,
-    kubernetes_secret.docker_registry
+    kubernetes_secret.docker_registry,
+    kubernetes_secret.console,
   ]
 
   lifecycle {
@@ -84,6 +85,11 @@ resource "kubernetes_deployment" "pomerium-console" {
             "--tls-derive=pomerium-console.${var.namespace_name}.svc.cluster.local",
             "serve",
           ]
+
+          env {
+            name  = "CONFIG_HASH"
+            value = md5(jsonencode(kubernetes_secret.console.data))
+          }
 
           env {
             name  = "AUDIENCE"

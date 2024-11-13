@@ -23,9 +23,21 @@ resource "tls_private_key" "signing_key" {
 
 resource "random_bytes" "shared_secret" {
   length = 32
+  lifecycle {
+    create_before_destroy = true
+  }
+  keepers = {
+    version = var.secrets_version
+  }
 }
 
 resource "random_bytes" "cookie_secret" {
   length = 32
+  lifecycle {
+    create_before_destroy = true
+  }
+  keepers = {
+    version = var.secrets_version
+  }
 }
 
