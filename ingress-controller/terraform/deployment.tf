@@ -23,6 +23,14 @@ resource "kubernetes_deployment" "pomerium" {
   spec {
     replicas = var.deployment_replicas
 
+    strategy {
+      type = "RollingUpdate"
+      rolling_update {
+        max_surge       = var.rolling_update.max_surge
+        max_unavailable = var.rolling_update.max_unavailable
+      }
+    }
+
     selector {
       match_labels = local.pod_labels
     }

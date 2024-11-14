@@ -192,3 +192,9 @@ variable "bootstrap_secret" {
     namespace = string
   })
 }
+
+variable "prometheus_url" {
+  description = "URL of the Prometheus server to query for metrics"
+  type        = string
+  default     = ""
+}

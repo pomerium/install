@@ -165,6 +165,11 @@ resource "kubernetes_deployment" "pomerium-console" {
           }
 
           env {
+            name  = "PROMETHEUS_URL"
+            value = var.prometheus_url
+          }
+
+          env {
             name  = "TMPDIR"
             value = "/tmp"
           }

@@ -253,6 +253,18 @@ variable "config" {
   default = {}
 }
 
+variable "rolling_update" {
+  description = "Rolling update configuration"
+  type = object({
+    max_surge       = optional(string)
+    max_unavailable = optional(string)
+  })
+  default = {
+    max_surge       = "25%"
+    max_unavailable = "25%"
+  }
+}
+
 variable "secrets_version" {
   description = "Version of the secrets. Changing this will cause the secrets to be regenerated."
   type        = number
