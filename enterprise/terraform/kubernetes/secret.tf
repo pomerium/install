@@ -4,6 +4,8 @@ resource "kubernetes_secret" "console" {
     namespace = var.namespace_name
   }
 
+  depends_on = [data.kubernetes_secret.core_secrets]
+
   type = "Opaque"
 
   data = {
@@ -12,6 +14,7 @@ resource "kubernetes_secret" "console" {
     "database_encryption_key_b64" = random_bytes.database_encryption_key.base64
     "shared_secret_b64"           = data.kubernetes_secret.core_secrets.binary_data["shared_secret"]
     "signing_key_b64"             = data.kubernetes_secret.core_secrets.binary_data["signing_key"]
+    "rv"                          = data.kubernetes_secret.core_secrets.metadata[0].resource_version
   }
 }
 

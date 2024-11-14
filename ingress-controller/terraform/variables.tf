@@ -264,3 +264,9 @@ variable "rolling_update" {
     max_unavailable = "25%"
   }
 }
+
+variable "secrets_version" {
+  description = "Version of the secrets. Changing this will cause the secrets to be regenerated."
+  type        = number
+  default     = 1
+}
