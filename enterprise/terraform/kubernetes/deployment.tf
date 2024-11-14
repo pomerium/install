@@ -29,7 +29,8 @@ resource "kubernetes_deployment" "pomerium-console" {
     template {
       metadata {
         labels = {
-          "app.kubernetes.io/name" = "pomerium-console"
+          "app.kubernetes.io/name"      = "pomerium-console"
+          "pomerium.io/config-checksum" = local.config_checksum
         }
       }
 
@@ -87,23 +88,18 @@ resource "kubernetes_deployment" "pomerium-console" {
           ]
 
           env {
-            name  = "CONFIG_HASH"
-            value = md5(jsonencode(kubernetes_secret.console.data))
-          }
-
-          env {
             name  = "AUDIENCE"
-            value = join(",", local.audience)
+            value = join(",", local.config.audience)
           }
 
           env {
             name  = "ADMINISTRATORS"
-            value = join(",", var.administrators)
+            value = join(",", local.config.administrators)
           }
 
           env {
             name  = "DATABROKER_SERVICE_URL"
-            value = "https://pomerium-databroker.${var.core_namespace_name}.svc"
+            value = local.config.databroker_service_url
           }
 
           env {
@@ -161,12 +157,12 @@ resource "kubernetes_deployment" "pomerium-console" {
 
           env {
             name  = "LICENSE_KEY_VALIDATE_OFFLINE"
-            value = var.license_key_validate_offline
+            value = local.config.license_key_validate_offline
           }
 
           env {
             name  = "PROMETHEUS_URL"
-            value = var.prometheus_url
+            value = local.config.prometheus_url
           }
 
           env {
