@@ -175,6 +175,11 @@ resource "kubernetes_deployment" "pomerium-console" {
             value = "/tmp"
           }
 
+          env {
+            name  = "VALIDATION_MODE"
+            value = var.validation_mode
+          }
+
           volume_mount {
             name       = "tmp"
             mount_path = "/tmp"
