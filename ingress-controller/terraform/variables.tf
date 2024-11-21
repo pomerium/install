@@ -232,7 +232,7 @@ variable "config" {
       secret              = string
       url                 = optional(string)
     }))
-    jwtClaimsHeaders            = optional(map(string))
+    jwtClaimHeaders             = optional(map(string))
     passIdentityHeaders         = optional(bool)
     programmaticRedirectDomains = optional(string)
     runtimeFlags                = optional(map(bool))
