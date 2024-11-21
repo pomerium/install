@@ -19,7 +19,7 @@ variable "image_name" {
 variable "image_tag" {
   description = "Container image tag"
   type        = string
-  default     = "v0.27.2"
+  default     = "v0.28.0"
 }
 
 variable "image_pull_policy" {
@@ -197,4 +197,14 @@ variable "prometheus_url" {
   description = "URL of the Prometheus server to query for metrics"
   type        = string
   default     = ""
+}
+
+variable "validation_mode" {
+  description = "Validation mode for the Pomerium Enterprise deployment"
+  type        = string
+  default     = "full"
+  validation {
+    condition     = contains(["disabled", "static", "full"], var.validation_mode)
+    error_message = "validation_mode must be one of 'disabled', 'static', or 'full'"
+  }
 }
