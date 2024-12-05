@@ -34,9 +34,3 @@ variable "db_tier" {
   description = "The tier of the database"
   default     = "db-f1-micro"
 }
-
-variable "update_cloud_dns_zone" {
-  type        = string
-  description = "The Google Cloud DNS zone to update with the wildcard record"
-  default     = null
-}
