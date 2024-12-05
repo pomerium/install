@@ -14,18 +14,18 @@ locals {
     annotations = local.access_annotations
   }
 
-  enterprise_dsn = "postgres://${google_sql_user.pomerium.name}:${random_password.pomerium.result}@localhost/${google_sql_database.console.name}?sslmode=disable"
+  enterprise_dsn = "postgres://${google_sql_user.pomerium.name}:${random_password.pomerium.result}@127.0.0.1/${google_sql_database.console.name}?sslmode=disable"
 }
 
 module "pomerium_enterprise" {
-  source = "git::https://github.com/pomerium/documentation//terraform/enterprise-k8s?ref=main"
+  source = "git::https://github.com/pomerium/install//enterprise/terraform/kubernetes?ref=main"
 
   depends_on = [
     module.pomerium_ingress_controller,
     resource.google_sql_database.console,
   ]
 
-  administrators = var.administrator
+  administrators = var.administrators
   namespace_name = local.namespace_name
 
   database_url            = local.enterprise_dsn

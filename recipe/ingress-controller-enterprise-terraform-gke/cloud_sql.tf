@@ -54,11 +54,27 @@ resource "google_sql_user" "pomerium" {
 
 resource "google_service_account" "pomerium" {
   account_id   = "pomerium"
-  display_name = "Pomerium Service Account"
+  display_name = "Service Account to allow Pomerium to access Cloud SQL"
+}
+
+locals {
+  service_account_roles = [
+    "roles/cloudsql.client",
+  ]
+}
+
+resource "google_project_iam_member" "pomerium" {
+  for_each = toset(local.service_account_roles)
+
+  project = var.gcp_project
+  role    = each.value
+  member  = "serviceAccount:${google_service_account.pomerium.email}"
 }
 
 resource "google_service_account_iam_binding" "pomerium" {
-  service_account_id = google_service_account.pomerium.email
-  role               = "roles/cloudsql.client"
-  members            = ["serviceAccount:${google_service_account.pomerium.email}"]
+  role               = "roles/iam.workloadIdentityUser"
+  service_account_id = google_service_account.pomerium.id
+  members = [
+    "serviceAccount:${var.gcp_project}.svc.id.goog[pomerium-enterprise/pomerium-console]",
+  ]
 }

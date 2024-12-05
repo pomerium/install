@@ -7,4 +7,3 @@ provider "google" {
   region  = var.gcp_region
 }
 
-provider "random" {}
