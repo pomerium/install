@@ -14,7 +14,7 @@ resource "google_sql_database_instance" "pomerium" {
 }
 
 locals {
-  db_instance_name = "pomerium"
+  db_instance_name = "${var.prefix}-pomerium"
 
   sql_proxy_sidecar = {
     name  = "cloud-sql-proxy"
@@ -53,8 +53,8 @@ resource "google_sql_user" "pomerium" {
 }
 
 resource "google_service_account" "pomerium" {
-  account_id   = "pomerium"
-  display_name = "Service Account to allow Pomerium to access Cloud SQL"
+  account_id   = "${var.prefix}-pomerium"
+  display_name = "Service Account to allow Pomerium (${var.prefix}) to access Cloud SQL"
 }
 
 locals {

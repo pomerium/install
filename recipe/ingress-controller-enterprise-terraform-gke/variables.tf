@@ -34,3 +34,9 @@ variable "db_tier" {
   description = "The tier of the database"
   default     = "db-f1-micro"
 }
+
+variable "prefix" {
+  type        = string
+  description = "Prefix to add to all cloud resources for uniqueness"
+  default     = "prod"
+}
