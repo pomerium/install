@@ -83,13 +83,13 @@ resource "kubernetes_deployment" "pomerium" {
           }
 
           port {
-            container_port = 8443
+            container_port = 443
             name           = "https"
             protocol       = "TCP"
           }
 
           port {
-            container_port = 8080
+            container_port = 80
             name           = "http"
             protocol       = "TCP"
           }
