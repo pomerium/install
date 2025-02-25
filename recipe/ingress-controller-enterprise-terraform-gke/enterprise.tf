@@ -28,6 +28,8 @@ module "pomerium_enterprise" {
   administrators = var.administrators
   namespace_name = local.namespace_name
 
+  image_tag = var.pomerium_enterprise_image_tag
+
   database_url            = local.enterprise_dsn
   license_key             = var.license_key
   image_registry_password = var.image_registry_password
