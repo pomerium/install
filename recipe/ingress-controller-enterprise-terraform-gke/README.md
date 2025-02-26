@@ -1,4 +1,4 @@
-This recipe installs Pomerium Ingress Controller and Pomerium Enterprise into existing Kubernetes Cluster.
+This recipe installs Pomerium Ingress Controller and Pomerium Enterprise into an existing Kubernetes cluster.
 
 ```hcl
 provider kubernetes {
