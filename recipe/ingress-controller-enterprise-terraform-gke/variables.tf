@@ -40,3 +40,15 @@ variable "prefix" {
   description = "Prefix to add to all cloud resources for uniqueness"
   default     = "prod"
 }
+
+variable "ingress_controller_image_tag" {
+  type        = string
+  description = "The image tag for the ingress controller"
+  default     = "main"
+}
+
+variable "pomerium_enterprise_image_tag" {
+  type        = string
+  description = "The image tag for the enterprise installation"
+  default     = "main"
+}
