@@ -208,3 +208,9 @@ variable "validation_mode" {
     error_message = "validation_mode must be one of 'disabled', 'static', or 'full'"
   }
 }
+
+variable "bootstrap_service_account" {
+  description = "Enable a bootstrap service account that may be used by the Terraform Provider to complete the console configuration."
+  type        = bool
+  default     = false
+}
