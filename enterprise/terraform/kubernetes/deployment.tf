@@ -180,6 +180,11 @@ resource "kubernetes_deployment" "pomerium-console" {
             value = var.validation_mode
           }
 
+          env {
+            name  = "BOOTSTRAP_SERVICE_ACCOUNT"
+            value = var.bootstrap_service_account
+          }
+
           volume_mount {
             name       = "tmp"
             mount_path = "/tmp"
