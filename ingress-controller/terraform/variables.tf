@@ -248,6 +248,11 @@ variable "config" {
       read  = optional(string)
       write = optional(string)
     }))
+    otel = optional(object({
+      endpoint  = optional(string)
+      protocol  = optional(string)
+      logLevel  = optional(string)
+    }))
     useProxyProtocol = optional(bool)
   })
   default = {}
