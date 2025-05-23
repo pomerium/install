@@ -1,0 +1,34 @@
+# Pomerium Enterprise Credentials
+pomerium_license_key       = "YOUR_LICENSE_KEY"
+pomerium_registry_password = "YOUR_REGISTRY_PASSWORD"
+
+# Demo Administrators
+demo_administrators = [
+  "admin@pomerium.com",
+  "demo@pomerium.com"
+]
+
+# Identity Provider Configuration
+# For Google OAuth:
+idp_provider      = "google"
+idp_client_id     = "YOUR_GOOGLE_CLIENT_ID"
+idp_client_secret = "YOUR_GOOGLE_CLIENT_SECRET"
+
+# For GitHub OAuth:
+# idp_provider      = "github"
+# idp_client_id     = "YOUR_GITHUB_CLIENT_ID"
+# idp_client_secret = "YOUR_GITHUB_CLIENT_SECRET"
+
+# Access Control
+allowed_email_domains = [
+  "pomerium.com",
+  "pomerium.io"
+]
+
+# Demo Features
+demo_features = {
+  enable_tcp_proxy    = true
+  enable_device_trust = false
+  enable_groups       = true
+  enable_metrics      = true
+}
