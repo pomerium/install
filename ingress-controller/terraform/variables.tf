@@ -244,9 +244,20 @@ variable "config" {
       })
     }))
     timeouts = optional(object({
-      idle  = optional(string)
-      read  = optional(string)
-      write = optional(string)
+      idle   = optional(string)
+      read   = optional(string)
+      write  = optional(string)
+    }))
+    otel = optional(object({
+      endpoint              = string                 # required
+      protocol              = string                 # required
+      headers               = optional(map(string))
+      timeout               = optional(string)
+      sampling              = optional(number)
+      resourceAttributes    = optional(map(string))
+      bspScheduleDelay      = optional(string)
+      bspMaxExportBatchSize = optional(number)
+      logLevel              = optional(string)
     }))
     useProxyProtocol = optional(bool)
   })
