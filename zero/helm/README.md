@@ -28,7 +28,7 @@ The following table lists the configurable parameters of the Pomerium Zero chart
 | ------------------- | ----------------------------------- | ------------------- |
 | `pomeriumZeroToken` | Pomerium Zero token (required)      | `""`                |
 | `image.repository`  | Image repository                    | `pomerium/pomerium` |
-| `image.tag`         | Image tag                           | `v0.27.2`           |
+| `image.tag`         | Image tag                           | `v0.30.0`           |
 | `image.pullPolicy`  | Image pull policy                   | `IfNotPresent`      |
 | `replicaCount`      | Number of replicas                  | `1`                 |
 | `resources`         | CPU/Memory resource requests/limits | `{}`                |
