@@ -1,0 +1,156 @@
+# Pomerium Zero Helm Chart - Demo Environment Configuration
+# This example shows how to deploy Pomerium Zero for demo.pomerium.com
+
+# REQUIRED: Pomerium Zero deployment token
+# Get this from https://console.pomerium.app/
+pomeriumZeroToken: "YOUR_POMERIUM_ZERO_TOKEN"
+
+# Service configuration for GKE
+service:
+  type: LoadBalancer
+  annotations:
+    # Use static IP reserved in Terraform
+    kubernetes.io/ingress.global-static-ip-name: "pomerium-demo-cluster-pomerium-lb"
+  ports:
+    https: 443
+    grpc: 443
+
+# Persistence for Zero's local state
+persistence:
+  enabled: true
+  size: 10Gi
+  storageClass: "standard-rwo"  # GKE default storage class
+
+# Resource allocation for demo
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+# High availability for demo
+replicaCount: 2
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector for GKE
+nodeSelector:
+  purpose: "pomerium-public-demo"
+
+# Environment variables
+env:
+  - name: POMERIUM_DEBUG
+    value: "true"  # Enable debug logging for demo
+  - name: COOKIE_DOMAIN
+    value: "demo.pomerium.com"
+
+# Bootstrap configuration
+bootstrap:
+  # Domain configuration
+  domain: "demo.pomerium.com"
+  
+  # Administrator emails
+  administrators:
+    - "admin@pomerium.com"
+    - "demo@pomerium.com"
+  
+  # Example routes for demo
+  routes:
+    - name: "Verify Service"
+      from: "https://verify.demo.pomerium.com"
+      to: "http://verify.pomerium-demo-apps.svc.cluster.local"
+      policy:
+        - allow:
+            or:
+              - domain:
+                  is: "pomerium.com"
+              - domain:
+                  is: "pomerium.io"
+      allow_public_unauthenticated_access: true
+      pass_identity_headers: true
+    
+    - name: "Hello World App"
+      from: "https://hello.demo.pomerium.com"
+      to: "http://hello-world.pomerium-demo-apps.svc.cluster.local"
+      policy:
+        - allow:
+            or:
+              - email:
+                  ends_with: "@pomerium.com"
+              - email:
+                  ends_with: "@pomerium.io"
+    
+    - name: "Admin Panel"
+      from: "https://admin.demo.pomerium.com"
+      to: "http://admin-panel.pomerium-demo-apps.svc.cluster.local"
+      policy:
+        - allow:
+            and:
+              - email:
+                  is: "admin@pomerium.com"
+    
+    - name: "Grafana Metrics"
+      from: "https://grafana.demo.pomerium.com"
+      to: "http://grafana.pomerium-demo-apps.svc.cluster.local"
+      policy:
+        - allow:
+            or:
+              - domain:
+                  is: "pomerium.com"
+              - groups:
+                  has: "engineering"
+  
+  # TCP Routes for SSH demo
+  tcp_routes:
+    - name: "SSH Demo Server"
+      from: "tcp+https://ssh.demo.pomerium.com:22"
+      to: "tcp://10.0.0.10:22"  # Update with actual SSH VM IP
+      policy:
+        - allow:
+            or:
+              - email:
+                  ends_with: "@pomerium.com"
+              - groups:
+                  has: "developers"
+
+# Monitoring and observability
+metrics:
+  enabled: true
+  port: 9090
+  serviceMonitor:
+    enabled: true  # If Prometheus operator is installed
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+  capabilities:
+    drop:
+      - ALL
+
+# Ingress (if not using LoadBalancer)
+# ingress:
+#   enabled: true
+#   className: "gce"
+#   annotations:
+#     kubernetes.io/ingress.global-static-ip-name: "pomerium-demo-ip"
+#     networking.gke.io/managed-certificates: "pomerium-demo-cert"
+#   hosts:
+#     - host: "*.demo.pomerium.com"
+#       paths:
+#         - path: /
+#           pathType: Prefix

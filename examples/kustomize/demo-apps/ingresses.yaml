@@ -1,0 +1,103 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: verify-app
+  annotations:
+    ingress.pomerium.io/policy: |
+      - allow:
+          or:
+            - domain:
+                is: pomerium.com
+            - domain:
+                is: pomerium.io
+    ingress.pomerium.io/allow_public_unauthenticated_access: "true"
+    ingress.pomerium.io/pass_identity_headers: "true"
+spec:
+  ingressClassName: pomerium
+  rules:
+  - host: verify.demo.pomerium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: verify
+            port:
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-world
+  annotations:
+    ingress.pomerium.io/policy: |
+      - allow:
+          or:
+            - email:
+                ends_with: "@pomerium.com"
+            - email:
+                ends_with: "@pomerium.io"
+spec:
+  ingressClassName: pomerium
+  rules:
+  - host: hello.demo.pomerium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-world
+            port:
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: admin-panel
+  annotations:
+    ingress.pomerium.io/policy: |
+      - allow:
+          and:
+            - email:
+                is: admin@pomerium.com
+spec:
+  ingressClassName: pomerium
+  rules:
+  - host: admin.demo.pomerium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: admin-panel
+            port:
+              number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana
+  annotations:
+    ingress.pomerium.io/policy: |
+      - allow:
+          or:
+            - domain:
+                is: pomerium.com
+            - groups:
+                has: engineering
+spec:
+  ingressClassName: pomerium
+  rules:
+  - host: grafana.demo.pomerium.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 80

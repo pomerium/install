@@ -1,0 +1,11 @@
+# Example values for Pomerium Zero Helm Chart.
+# IMPORTANT: Replace with your actual token.
+pomeriumZeroToken: "REPLACE_ME_WITH_YOUR_TOKEN"
+
+# You can override other default chart values here.
+# For a full list of values, see ../../../zero/helm/values.yaml
+
+# image:
+#   tag: "specific-version"
+
+# replicaCount: 1
