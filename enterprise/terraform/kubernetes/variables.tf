@@ -92,20 +92,6 @@ variable "license_key" {
   sensitive   = true
 }
 
-variable "resources_requests" {
-  description = "Resource requests for the container"
-  type = object({
-    cpu               = string
-    memory            = string
-    ephemeral_storage = string
-  })
-  default = {
-    cpu               = "2"
-    memory            = "4Gi"
-    ephemeral_storage = "4Gi"
-  }
-}
-
 variable "resources_limits_cpu" {
   description = "Resource CPU limits for the container"
   type        = string
