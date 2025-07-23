@@ -21,7 +21,8 @@ resource "kubernetes_deployment" "pomerium" {
   }
 
   spec {
-    replicas = var.deployment_replicas
+    replicas          = var.deployment_replicas
+    min_ready_seconds = var.min_ready_seconds
 
     strategy {
       type = "RollingUpdate"
