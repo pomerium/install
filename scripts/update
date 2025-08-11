@@ -1,9 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
-CORE_TAG="${CORE_TAG?'CORE_TAG is required'}"
-ENTERPRISE_TAG="${ENTERPRISE_TAG?'ENTERPRISE_TAG is required'}"
-INGRESS_CONTROLLER_TAG="${INGRESS_CONTROLLER_TAG?'INGRESS_CONTROLLER_TAG is required'}"
+CORE_VERSION="${CORE_VERSION?'CORE_VERSION is required'}"
+ENTERPRISE_VERSION="${ENTERPRISE_VERSION?'ENTERPRISE_VERSION is required'}"
+INGRESS_CONTROLLER_VERSION="${INGRESS_CONTROLLER_VERSION?'INGRESS_CONTROLLER_VERSION is required'}"
 
 download-file() {
   local _dst="${1}"
@@ -23,16 +23,19 @@ sed-file() {
 }
 
 download-file "./ingress-controller/kustomize/crd/bases/ingress.pomerium.io_pomerium.yaml" \
-  "https://raw.githubusercontent.com/pomerium/ingress-controller/refs/tags/$INGRESS_CONTROLLER_TAG/config/crd/bases/ingress.pomerium.io_pomerium.yaml"
+  "https://raw.githubusercontent.com/pomerium/ingress-controller/refs/tags/v$INGRESS_CONTROLLER_VERSION/config/crd/bases/ingress.pomerium.io_pomerium.yaml"
 
 sed-file ./ingress-controller/terraform/variables.tf \
-  '/image_tag/{n;n;n;s/".*"/"'"$INGRESS_CONTROLLER_TAG"'"/}'
+  '/image_tag/{n;n;n;s/".*"/"v'"$INGRESS_CONTROLLER_VERSION"'"/}'
 
 sed-file ./recipe/ingress-controller-enterprise-terraform-gke/README.md \
-  's/(ref=)(v.*)/\1'"$INGRESS_CONTROLLER_TAG"'/g'
+  's/(ref=)(v.*)/\1v'"$INGRESS_CONTROLLER_VERSION"'/g'
 
 sed-file ./enterprise/terraform/kubernetes/variables.tf \
-  '/image_tag/{n;n;n;s/".*"/"'"$ENTERPRISE_TAG"'"/}'
+  '/image_tag/{n;n;n;s/".*"/"v'"$ENTERPRISE_VERSION"'"/}'
 
 sed-file ./zero/helm/Chart.yaml \
-  's/(version: |appVersion: )(.*)/\1'"$CORE_TAG"'/g'
+  's/(version: )(.*)/\1'"$CORE_VERSION"'/g'
+
+sed-file ./zero/helm/Chart.yaml \
+  's/(appVersion: )(.*)/\1v'"$CORE_VERSION"'/g'
