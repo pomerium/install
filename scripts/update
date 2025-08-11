@@ -29,7 +29,7 @@ sed-file ./ingress-controller/terraform/variables.tf \
   '/image_tag/{n;n;n;s/".*"/"v'"$INGRESS_CONTROLLER_VERSION"'"/}'
 
 sed-file ./recipe/ingress-controller-enterprise-terraform-gke/README.md \
-  's/(ref=)(v.*)/\1v'"$INGRESS_CONTROLLER_VERSION"'/g'
+  's/(ref=v)(.*)(")/\1'"$INGRESS_CONTROLLER_VERSION"'\3/g'
 
 sed-file ./enterprise/terraform/kubernetes/variables.tf \
   '/image_tag/{n;n;n;s/".*"/"v'"$ENTERPRISE_VERSION"'"/}'
