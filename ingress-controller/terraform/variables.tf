@@ -217,12 +217,32 @@ variable "config" {
     }))
     caSecrets    = optional(list(string))
     certificates = optional(list(string))
+    circuitBreakerThresholds = optional(object({
+      maxConnectionPools = optional(number)
+      maxConnections     = optional(number)
+      maxPendingRequests = optional(number)
+      maxRequests        = optional(number)
+      maxRetries         = optional(number)
+    }))
     cookie = optional(object({
       domain   = optional(string)
       expire   = optional(string)
       httpOnly = optional(bool)
       name     = optional(string)
       sameSite = optional(string)
+    }))
+    downstreamMtls = optional(object({
+      ca          = optional(string)
+      crl         = optional(string)
+      enforcement = optional(string)
+      matchSubjectAltNames = optional(object({
+        dns               = optional(string)
+        email             = optional(string)
+        ipAddress         = optional(string)
+        uri               = optional(string)
+        userPrincipalName = optional(string)
+      }))
+      maxVerifyDepth = optional(number)
     }))
     identityProvider = optional(object({
       provider            = string
@@ -232,10 +252,25 @@ variable "config" {
       secret              = string
       url                 = optional(string)
     }))
-    jwtClaimHeaders             = optional(map(string))
+    jwtClaimHeaders = optional(map(string))
+    otel = optional(object({
+      endpoint              = string # required
+      protocol              = string # required
+      headers               = optional(map(string))
+      timeout               = optional(string)
+      sampling              = optional(number)
+      resourceAttributes    = optional(map(string))
+      bspScheduleDelay      = optional(string)
+      bspMaxExportBatchSize = optional(number)
+      logLevel              = optional(string)
+    }))
     passIdentityHeaders         = optional(bool)
     programmaticRedirectDomains = optional(string)
     runtimeFlags                = optional(map(bool))
+    ssh = optional(object({
+      hostKeySecrets  = optional(list(string))
+      userCaKeySecret = optional(string)
+    }))
     storage = optional(object({
       postgres = object({
         caSecret  = optional(string)
@@ -247,17 +282,6 @@ variable "config" {
       idle  = optional(string)
       read  = optional(string)
       write = optional(string)
-    }))
-    otel = optional(object({
-      endpoint              = string # required
-      protocol              = string # required
-      headers               = optional(map(string))
-      timeout               = optional(string)
-      sampling              = optional(number)
-      resourceAttributes    = optional(map(string))
-      bspScheduleDelay      = optional(string)
-      bspMaxExportBatchSize = optional(number)
-      logLevel              = optional(string)
     }))
     useProxyProtocol = optional(bool)
   })
