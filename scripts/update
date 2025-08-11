@@ -1,0 +1,38 @@
+#!/bin/bash
+set -euo pipefail
+
+CORE_TAG="${CORE_TAG?'CORE_TAG is required'}"
+ENTERPRISE_TAG="${ENTERPRISE_TAG?'ENTERPRISE_TAG is required'}"
+INGRESS_CONTROLLER_TAG="${INGRESS_CONTROLLER_TAG?'INGRESS_CONTROLLER_TAG is required'}"
+
+download-file() {
+  local _dst="${1}"
+  local _url="${2}"
+  echo "updating $_dst from $_url"
+	curl -s -o "$_dst" -z "$_dst" "$_url"
+}
+
+sed-file() {
+  local _dst="${1}"
+  local _pattern="${2}"
+  local _tmp
+  echo "updating $_dst using $_pattern"
+  _tmp="$(mktemp /tmp/config.XXXXXXXXXX)"
+  sed -E "$_pattern" "$_dst" > "$_tmp"
+  mv "$_tmp" "$_dst"
+}
+
+download-file "./ingress-controller/kustomize/crd/bases/ingress.pomerium.io_pomerium.yaml" \
+  "https://raw.githubusercontent.com/pomerium/ingress-controller/refs/tags/$INGRESS_CONTROLLER_TAG/config/crd/bases/ingress.pomerium.io_pomerium.yaml"
+
+sed-file ./ingress-controller/terraform/variables.tf \
+  '/image_tag/{n;n;n;s/".*"/"'"$INGRESS_CONTROLLER_TAG"'"/}'
+
+sed-file ./recipe/ingress-controller-enterprise-terraform-gke/README.md \
+  's/(ref=)(v.*)/\1'"$INGRESS_CONTROLLER_TAG"'/g'
+
+sed-file ./enterprise/terraform/kubernetes/variables.tf \
+  '/image_tag/{n;n;n;s/".*"/"'"$ENTERPRISE_TAG"'"/}'
+
+sed-file ./zero/helm/Chart.yaml \
+  's/(version: |appVersion: )(.*)/\1'"$CORE_TAG"'/g'
