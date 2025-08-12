@@ -84,6 +84,7 @@ resource "kubernetes_deployment" "pomerium-console" {
 
           args = [
             "--tls-derive=pomerium-console.${var.namespace_name}.svc.cluster.local",
+            "--metrics-addr=$(POD_IP):9090",
             "serve",
           ]
 
@@ -181,6 +182,15 @@ resource "kubernetes_deployment" "pomerium-console" {
           }
 
           env {
+            name = "POD_IP"
+            value_from {
+              field_ref {
+                field_path = "status.podIP"
+              }
+            }
+          }
+
+          env {
             name  = "BOOTSTRAP_SERVICE_ACCOUNT"
             value = var.bootstrap_service_account
           }
@@ -199,6 +209,12 @@ resource "kubernetes_deployment" "pomerium-console" {
           port {
             name           = "grpc-api"
             container_port = 8702
+            protocol       = "TCP"
+          }
+
+          port {
+            name           = "metrics"
+            container_port = 9090
             protocol       = "TCP"
           }
 
