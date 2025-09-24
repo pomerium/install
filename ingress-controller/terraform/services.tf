@@ -69,7 +69,8 @@ resource "kubernetes_service" "databroker" {
       target_port = "databroker"
       protocol    = "TCP"
     }
-
     type = "ClusterIP"
+    cluster_ip = "None"
+    publish_not_ready_addresses = true
   }
 }
