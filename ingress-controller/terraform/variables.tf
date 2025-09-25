@@ -311,3 +311,15 @@ variable "secrets_version" {
   type        = number
   default     = 1
 }
+
+variable "use_clustered_databroker" {
+  description = "Setup a separate cluster of databroker nodes in clustered mode."
+  type        = bool
+  default     = false
+}
+
+variable "clustered_databroker_cluster_size" {
+  description = "The number of nodes for the clustered databroker."
+  type        = number
+  default     = 3
+}

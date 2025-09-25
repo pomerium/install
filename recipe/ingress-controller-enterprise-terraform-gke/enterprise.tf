@@ -57,5 +57,7 @@ module "pomerium_enterprise" {
   sidecars = [
     local.sql_proxy_sidecar
   ]
-}
 
+  use_clustered_databroker          = var.use_clustered_databroker
+  clustered_databroker_cluster_size = var.clustered_databroker_cluster_size
+}

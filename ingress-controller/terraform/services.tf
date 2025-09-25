@@ -15,7 +15,8 @@ resource "kubernetes_service" "proxy" {
 
   spec {
     selector = {
-      "app.kubernetes.io/name" = "pomerium-ingress-controller"
+      "app.kubernetes.io/name"      = "pomerium-ingress-controller"
+      "app.kubernetes.io/component" = "proxy"
     }
 
     external_traffic_policy = var.proxy_service_type == "LoadBalancer" ? "Local" : null
@@ -43,8 +44,15 @@ resource "kubernetes_service" "proxy" {
   }
 }
 
+# create a terraform data resource to represent the use_clustered_databroker state
+# when it changes the databroker service needs to be recreated so it can be assigned
+# a cluster ip
+resource "terraform_data" "use_clustered_databroker" {
+  input = var.use_clustered_databroker
+}
+
 resource "kubernetes_service" "databroker" {
-  count = var.enable_databroker ? 1 : 0
+  count = (var.enable_databroker || var.use_clustered_databroker) ? 1 : 0
 
   metadata {
     name      = "pomerium-databroker"
@@ -56,20 +64,37 @@ resource "kubernetes_service" "databroker" {
     ignore_changes = [
       metadata[0].annotations
     ]
+    replace_triggered_by = [
+      terraform_data.use_clustered_databroker
+    ]
   }
 
   spec {
-    selector = {
-      "app.kubernetes.io/name" = "pomerium-ingress-controller"
-    }
+    selector = merge(
+      {
+        "app.kubernetes.io/name" = "pomerium-ingress-controller"
+      },
+      var.use_clustered_databroker ? {
+        "app.kubernetes.io/component" = "databroker"
+      } :
+      {}
+    )
 
     port {
-      name        = "databroker"
+      name        = "grpc"
       port        = 443
-      target_port = "databroker"
+      target_port = "grpc"
       protocol    = "TCP"
     }
 
-    type = "ClusterIP"
+    port {
+      name        = "raft"
+      port        = 5999
+      target_port = "raft"
+      protocol    = "TCP"
+    }
+
+    type       = "ClusterIP"
+    cluster_ip = var.use_clustered_databroker ? "None" : null
   }
 }
