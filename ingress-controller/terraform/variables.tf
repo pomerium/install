@@ -272,6 +272,9 @@ variable "config" {
       userCaKeySecret = optional(string)
     }))
     storage = optional(object({
+      file = object({
+        path = optional(string)
+      })
       postgres = object({
         caSecret  = optional(string)
         secret    = string

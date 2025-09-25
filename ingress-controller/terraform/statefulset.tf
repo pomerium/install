@@ -100,6 +100,68 @@ resource "kubernetes_stateful_set_v1" "pomerium-databroker" {
               }
             ])
           }
+          port {
+            name           = "grpc"
+            container_port = 5443
+            protocol       = "TCP"
+          }
+          port {
+            name           = "raft"
+            container_port = 5999
+            protocol       = "TCP"
+          }
+          resources {
+            limits = {
+              cpu    = var.resources_limits_cpu
+              memory = var.resources_limits_memory
+            }
+            requests = {
+              cpu    = var.resources_requests_cpu
+              memory = var.resources_requests_memory
+            }
+          }
+          security_context {
+            allow_privilege_escalation = false
+            read_only_root_filesystem  = true
+            run_as_group               = 65532
+            run_as_non_root            = true
+            run_as_user                = 65532
+          }
+          volume_mount {
+            name       = "tmp"
+            mount_path = "/tmp"
+          }
+          volume_mount {
+            name       = "storage"
+            mount_path = "/var/pomerium/databroker"
+          }
+        }
+        dynamic "toleration" {
+          for_each = var.tolerations
+          content {
+            key                = lookup(toleration.value, "key", null)
+            operator           = lookup(toleration.value, "operator", null)
+            value              = lookup(toleration.value, "value", null)
+            effect             = lookup(toleration.value, "effect", null)
+            toleration_seconds = lookup(toleration.value, "toleration_seconds", null)
+          }
+        }
+        volume {
+          name = "tmp"
+          empty_dir {}
+        }
+      }
+    }
+    volume_claim_template {
+      metadata {
+        name = "storage"
+      }
+      spec {
+        access_modes = ["ReadWriteOnce"]
+        resources {
+          requests = {
+            storage = "1Gi"
+          }
         }
       }
     }
