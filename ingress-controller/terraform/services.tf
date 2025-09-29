@@ -57,9 +57,6 @@ resource "kubernetes_service" "databroker" {
     ignore_changes = [
       metadata[0].annotations
     ]
-    replace_triggered_by = [
-      terraform_data.use_clustered_databroker
-    ]
   }
 
   spec {
