@@ -44,13 +44,6 @@ resource "kubernetes_service" "proxy" {
   }
 }
 
-# create a terraform data resource to represent the use_clustered_databroker state
-# when it changes the databroker service needs to be recreated so it can be assigned
-# a cluster ip
-resource "terraform_data" "use_clustered_databroker" {
-  input = var.use_clustered_databroker
-}
-
 resource "kubernetes_service" "databroker" {
   count = (var.enable_databroker || var.use_clustered_databroker) ? 1 : 0
 
@@ -94,7 +87,8 @@ resource "kubernetes_service" "databroker" {
       protocol    = "TCP"
     }
 
-    type       = "ClusterIP"
-    cluster_ip = var.use_clustered_databroker ? "None" : null
+    type                        = "ClusterIP"
+    cluster_ip                  = "None"
+    publish_not_ready_addresses = true
   }
 }
