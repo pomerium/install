@@ -13,9 +13,21 @@ resource "kubectl_manifest" "pomerium_config" {
 }
 
 locals {
-  default_config = {
-    secrets = "${var.namespace_name}/${local.secrets_name}"
-  }
+  default_config = merge(
+    {
+      secrets = "${var.namespace_name}/${local.secrets_name}"
+    },
+    var.use_clustered_databroker ? {
+      storage = {
+        file = {
+          path = "/var/pomerium/databroker"
+        }
+      }
+    } :
+    {},
+  )
 
-  config = var.config != null ? merge(local.default_config, var.config) : null
+  config = var.config != null ? merge(local.default_config, {
+    for k, v in var.config : k => v if v != null
+  }) : null
 }

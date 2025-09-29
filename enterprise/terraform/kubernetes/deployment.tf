@@ -99,8 +99,8 @@ resource "kubernetes_deployment" "pomerium-console" {
           }
 
           env {
-            name  = "DATABROKER_SERVICE_URL"
-            value = local.config.databroker_service_url
+            name  = "DATABROKER_SERVICE_URLS"
+            value = local.config.databroker_service_urls
           }
 
           env {

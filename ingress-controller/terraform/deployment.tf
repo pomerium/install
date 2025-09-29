@@ -2,7 +2,9 @@ resource "kubernetes_deployment" "pomerium" {
   metadata {
     name      = var.deployment_name
     namespace = var.namespace_name
-    labels    = local.deployment_labels
+    labels = merge(local.deployment_labels, {
+      "app.kubernetes.io/component" = "proxy"
+    })
   }
 
   depends_on = [
@@ -56,13 +58,27 @@ resource "kubernetes_deployment" "pomerium" {
           image             = "${var.image_repository}:${var.image_tag}"
           image_pull_policy = var.image_pull_policy
 
-          args = compact([
-            "all-in-one",
-            "--pomerium-config=${var.pomerium_config_name}",
-            "--update-status-from-service=${var.namespace_name}/pomerium-proxy",
-            "--metrics-bind-address=$(POD_IP):9090",
-            var.enable_databroker ? "--databroker-auto-tls=pomerium-databroker.${var.namespace_name}.svc" : null,
-          ])
+          args = concat(
+            [
+              "all-in-one",
+              "--pomerium-config=${var.pomerium_config_name}",
+              "--update-status-from-service=${var.namespace_name}/pomerium-proxy",
+              "--metrics-bind-address=$(POD_IP):9090",
+            ],
+            var.use_clustered_databroker ? concat(
+              [
+                "--databroker-auto-tls=*.pomerium-databroker.${var.namespace_name}.svc",
+                "--services=authenticate,authorize,proxy"
+              ],
+              [
+                for i in range(var.clustered_databroker_cluster_size) :
+                "--databroker-service-urls=https://pomerium-databroker-${i}.pomerium-databroker.${var.namespace_name}.svc:5443"
+              ]
+            ) :
+            var.enable_databroker ? [
+              "--databroker-auto-tls=pomerium-databroker.${var.namespace_name}.svc"
+            ] : []
+          )
 
           env {
             name  = "TMPDIR"
@@ -105,7 +121,16 @@ resource "kubernetes_deployment" "pomerium" {
             for_each = var.enable_databroker ? [1] : []
             content {
               container_port = 5443
-              name           = "databroker"
+              name           = "grpc"
+              protocol       = "TCP"
+            }
+          }
+
+          dynamic "port" {
+            for_each = var.enable_databroker ? [1] : []
+            content {
+              container_port = 5999
+              name           = "raft"
               protocol       = "TCP"
             }
           }

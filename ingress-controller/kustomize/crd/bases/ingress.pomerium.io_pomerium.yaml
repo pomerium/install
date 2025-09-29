@@ -189,9 +189,22 @@ spec:
                     - none
                     type: string
                 type: object
+              dataBroker:
+                description: DataBroker sets the databroker settings.
+                properties:
+                  clusterLeaderId:
+                    description: ClusterLeaderID defines the cluster leader in a clustered
+                      databroker.
+                    type: string
+                type: object
               dns:
                 description: DNS sets the dns settings.
                 properties:
+                  failureRefreshRate:
+                    description: FailureRefreshRate is the rate at which DNS lookups
+                      are refreshed when requests are failing.
+                    format: duration
+                    type: string
                   lookupFamily:
                     description: LookupFamily is the DNS IP address resolution policy.
                     enum:
@@ -213,6 +226,11 @@ spec:
                       a different name server.
                     format: int32
                     type: integer
+                  refreshRate:
+                    description: RefreshRate is the rate at which DNS lookups are
+                      refreshed.
+                    format: duration
+                    type: string
                   udpMaxQueries:
                     description: UDPMaxQueries caps the number of UDP based DNS queries
                       on a single port.
@@ -479,6 +497,17 @@ spec:
                   See <a href="https://www.pomerium.com/docs/topics/data-storage">Storage</a> for details.
                   If no storage is specified, Pomerium would use a transient in-memory storage (not recommended for production).
                 properties:
+                  file:
+                    description: File specifies file storage options.
+                    properties:
+                      path:
+                        description: Path defines the local file system path to store
+                          data.
+                        minLength: 1
+                        type: string
+                    required:
+                    - path
+                    type: object
                   postgres:
                     description: Postgres specifies PostgreSQL database connection
                       parameters

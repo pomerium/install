@@ -272,6 +272,9 @@ variable "config" {
       userCaKeySecret = optional(string)
     }))
     storage = optional(object({
+      file = object({
+        path = optional(string)
+      })
       postgres = object({
         caSecret  = optional(string)
         secret    = string
@@ -310,4 +313,16 @@ variable "secrets_version" {
   description = "Version of the secrets. Changing this will cause the secrets to be regenerated."
   type        = number
   default     = 1
+}
+
+variable "use_clustered_databroker" {
+  description = "Setup a separate cluster of databroker nodes in clustered mode."
+  type        = bool
+  default     = false
+}
+
+variable "clustered_databroker_cluster_size" {
+  description = "The number of nodes for the clustered databroker."
+  type        = number
+  default     = 3
 }
