@@ -57,6 +57,34 @@ resource "kubernetes_deployment" "pomerium" {
           name              = "pomerium-ingress-controller"
           image             = "${var.image_repository}:${var.image_tag}"
           image_pull_policy = var.image_pull_policy
+          startup_probe {
+            failure_threshold = 40
+            period_seconds = 15
+            http_get {
+              path = "/startupz"
+              port = 28080
+            }
+          }
+
+          liveness_probe {
+            failure_threshold = 10
+            period_seconds = 60
+            initial_delay_seconds = 15
+            http_get {
+              path = "/healthz"
+              port = 28080
+            }
+
+          }
+          readiness_probe {
+             failure_threshold = 5
+             initial_delay_seconds = 15
+             period_seconds = 60
+             http_get {
+               path = "/readyz"
+               port = 28080
+             }
+          }
 
           args = concat(
             [
@@ -64,6 +92,7 @@ resource "kubernetes_deployment" "pomerium" {
               "--pomerium-config=${var.pomerium_config_name}",
               "--update-status-from-service=${var.namespace_name}/pomerium-proxy",
               "--metrics-bind-address=$(POD_IP):9090",
+              "--health-probe-bind-address=$(POD_IP):28080"
             ],
             var.use_clustered_databroker ? concat(
               [
