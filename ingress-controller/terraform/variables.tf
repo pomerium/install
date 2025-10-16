@@ -34,7 +34,7 @@ variable "image_repository" {
 variable "image_tag" {
   description = "Container image tag"
   type        = string
-  default     = "v0.30.5"
+  default     = "v0.31.0"
 }
 
 variable "image_pull_policy" {
