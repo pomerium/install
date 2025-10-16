@@ -10,6 +10,9 @@ spec:
     {{- include "pomerium-zero.selectorLabels" . | nindent 4 }}
   ports:
     - port: {{ .Values.service.port }}
+      {{- if .Values.service.nodePort }}
+      nodePort: {{ .Values.service.nodePort }}
+      {{- end }}
       targetPort: https
       protocol: TCP
       name: https

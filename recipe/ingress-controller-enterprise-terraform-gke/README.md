@@ -6,7 +6,7 @@ provider kubernetes {
 }
 
 module "pomerium_enterprise_gke" {
-  source = "git::https://github.com/pomerium/install//recipe/ingress-controller-enterprise-terraform-gke?ref=v0.30.5"
+  source = "git::https://github.com/pomerium/install//recipe/ingress-controller-enterprise-terraform-gke?ref=v0.31.0"
 
   prefix                  = "prod"
   domain                  = "your wildcard domain name"
