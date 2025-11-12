@@ -37,10 +37,8 @@ module "pomerium_enterprise" {
   console_ingress     = local.console_ingress
   console_api_ingress = local.console_api_ingress
 
-  bootstrap_secret = {
-    name      = module.pomerium_ingress_controller.bootstrap_secret.name
-    namespace = module.pomerium_ingress_controller.bootstrap_secret.namespace
-  }
+  shared_secret_b64 = module.pomerium_ingress_controller.shared_secret_b64
+  signing_key_b64   = module.pomerium_ingress_controller.signing_key_b64
 
   service_account_annotations = {
     "iam.gke.io/gcp-service-account" = google_service_account.pomerium.email

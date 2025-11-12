@@ -171,12 +171,16 @@ variable "ingress_class_name" {
   default     = "pomerium"
 }
 
-variable "bootstrap_secret" {
-  description = "Reference to the core bootstrap secret to copy shared secrets from"
-  type = object({
-    name      = string
-    namespace = string
-  })
+variable "shared_secret_b64" {
+  description = "Base64-encoded shared secret from the Pomerium Core / Ingress controller"
+  type        = string
+  sensitive   = true
+}
+
+variable "signing_key_b64" {
+  description = "Base64-encoded signing key from the Pomerium Core / Ingress controller"
+  type        = string
+  sensitive   = true
 }
 
 variable "prometheus_url" {
