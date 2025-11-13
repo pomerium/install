@@ -10,7 +10,7 @@ locals {
         "https://pomerium-databroker-${i}.pomerium-databroker.${var.core_namespace_name}.svc:5443"
       ] :
       [
-        "https://pomerium-databroker.${var.core_namespace_name}.svc"
+        "https://pomerium-databroker.${var.core_namespace_name}.svc:5443"
       ]
     )
     secrets = kubernetes_secret.console.data
