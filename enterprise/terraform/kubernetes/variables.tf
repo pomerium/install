@@ -216,3 +216,9 @@ variable "clustered_databroker_cluster_size" {
   type        = number
   default     = 3
 }
+
+variable "disable_remote_diagnostics" {
+  description = "Disable remote diagnostics for the Pomerium Enterprise console"
+  type        = bool
+  default     = false
+}
