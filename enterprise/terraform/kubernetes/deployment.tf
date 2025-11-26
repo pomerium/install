@@ -195,6 +195,11 @@ resource "kubernetes_deployment" "pomerium-console" {
             value = var.bootstrap_service_account
           }
 
+          env {
+            name  = "DISABLE_REMOTE_DIAGNOSTICS"
+            value = var.disable_remote_diagnostics
+          }
+
           volume_mount {
             name       = "tmp"
             mount_path = "/tmp"
