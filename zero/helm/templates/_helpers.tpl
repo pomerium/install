@@ -58,3 +58,143 @@ Validate required values
 {{- fail "pomeriumZeroToken is required. Please set it in your values.yaml or provide it via --set flag." -}}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Pod spec shared between Deployment and StatefulSet
+*/}}
+{{- define "pomerium-zero.podSpec" -}}
+serviceAccountName: pomerium-zero
+securityContext:
+  {{- toYaml .Values.podSecurityContext | nindent 2 }}
+containers:
+  - name: {{ .Chart.Name }}
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+    imagePullPolicy: {{ .Values.image.pullPolicy }}
+    env:
+      - name: POMERIUM_ZERO_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: {{ include "pomerium-zero.fullname" . }}
+            key: pomerium_zero_token
+      - name: POMERIUM_NAMESPACE
+        valueFrom:
+          fieldRef:
+            apiVersion: v1
+            fieldPath: metadata.namespace
+      - name: POD_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+      {{- if .Values.persistence.enabled }}
+      - name: TMPDIR
+        value: /tmp/pomerium
+      - name: XDG_CACHE_HOME
+        value: /tmp/pomerium/cache
+      - name: XDG_DATA_HOME
+        value: /data
+      - name: BOOTSTRAP_CONFIG_FILE
+        value: /data/bootstrap.dat
+      - name: BOOTSTRAP_CONFIG_WRITEBACK_URI
+        value: file:///data/bootstrap.dat
+      {{- else }}
+      - name: BOOTSTRAP_CONFIG_FILE
+        value: "/var/run/secrets/pomerium/bootstrap.dat"
+      - name: BOOTSTRAP_CONFIG_WRITEBACK_URI
+        value: "secret://$(POMERIUM_NAMESPACE)/{{ include "pomerium-zero.fullname" . }}/bootstrap"
+      - name: XDG_CACHE_HOME
+        value: /tmp/pomerium/cache
+      - name: XDG_DATA_HOME
+        value: /tmp/pomerium/cache
+      {{- end }}
+      {{- with .Values.extraEnvVars }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    ports:
+      - containerPort: 443
+        name: https
+        protocol: TCP
+      - containerPort: 9090
+        name: metrics
+        protocol: TCP
+    volumeMounts:
+      - name: tmp
+        mountPath: /tmp
+      {{- if .Values.persistence.enabled }}
+      - name: data
+        mountPath: /data
+      {{- else }}
+      - name: bootstrap
+        mountPath: /var/run/secrets/pomerium
+        readOnly: true
+      {{- end }}
+      {{- with .Values.extraVolumeMounts }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+    resources:
+      {{- toYaml .Values.resources | nindent 6 }}
+    securityContext:
+      {{- toYaml .Values.securityContext | nindent 6 }}
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: https
+        scheme: HTTPS
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+    startupProbe:
+      httpGet:
+        path: /healthz
+        port: https
+        scheme: HTTPS
+      initialDelaySeconds: 5
+      timeoutSeconds: 1
+      periodSeconds: 5
+      successThreshold: 1
+      failureThreshold: 60
+  {{- with .Values.extraContainers }}
+  {{ toYaml . | nindent 2 }}
+  {{- end }}
+{{- with .Values.initContainers }}
+initContainers:
+  {{ toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.nodeSelector }}
+nodeSelector:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.affinity }}
+affinity:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.tolerations }}
+tolerations:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- with .Values.imagePullSecrets }}
+imagePullSecrets:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- if .Values.priorityClassName }}
+priorityClassName: {{ .Values.priorityClassName | quote }}
+{{- end }}
+{{- if .Values.runtimeClassName }}
+runtimeClassName: {{ .Values.runtimeClassName | quote }}
+{{- end }}
+volumes:
+  - name: tmp
+    emptyDir: {}
+  {{- if not .Values.persistence.enabled }}
+  - name: bootstrap
+    secret:
+      items:
+      - key: bootstrap
+        path: bootstrap.dat
+      optional: true
+      secretName: {{ include "pomerium-zero.fullname" . }}
+  {{- end }}
+  {{- with .Values.extraVolumes }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+{{- end -}}

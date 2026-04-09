@@ -1,12 +1,13 @@
-{{- if not .Values.persistence.enabled -}}
+{{- if .Values.persistence.enabled -}}
 {{- include "pomerium-zero.validateValues" . -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: {{ include "pomerium-zero.fullname" . }}
   labels:
     {{- include "pomerium-zero.labels" . | nindent 4 }}
 spec:
+  serviceName: {{ include "pomerium-zero.fullname" . }}
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
@@ -21,4 +22,18 @@ spec:
       {{- end }}
     spec:
       {{- include "pomerium-zero.podSpec" . | nindent 6 }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          {{- range .Values.persistence.accessModes }}
+          - {{ . }}
+          {{- end }}
+        {{- if .Values.persistence.storageClass }}
+        storageClassName: {{ .Values.persistence.storageClass }}
+        {{- end }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size }}
 {{- end }}
