@@ -141,6 +141,21 @@ assert_eq "custom image" "$(echo "$ss" | yq '.spec.template.spec.containers[0].i
 
 echo ""
 
+# ─── Namespace ────────────────────────────────────────────────────────
+
+echo "Suite: Namespace"
+
+out="$(render -n pomerium-zero)"
+ns="$(select_kind "$out" "Namespace")"
+assert_eq "creates Namespace by default" "$(echo "$ns" | yq '.kind')" "Namespace"
+assert_eq "namespace name matches release namespace" "$(echo "$ns" | yq '.metadata.name')" "pomerium-zero"
+
+out="$(render -n pomerium-zero --set createNamespace=false)"
+ns="$(select_kind "$out" "Namespace")"
+assert_eq "no Namespace when createNamespace=false" "$(echo "$ns" | yq '.kind')" "null"
+
+echo ""
+
 # ─── Validation ──────────────────────────────────────────────────────
 
 echo "Suite: Validation"

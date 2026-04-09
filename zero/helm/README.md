@@ -14,7 +14,7 @@ This Helm chart deploys Pomerium Zero, an identity-aware access proxy, on a Kube
 
 ```sh
 helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
-  --create-namespace -n pomerium-zero \
+  -n pomerium-zero \
   --set pomeriumZeroToken=your-pomerium-zero-token
 ```
 
@@ -25,7 +25,7 @@ git clone https://github.com/pomerium/install.git
 cd install/zero/helm
 
 helm install pomerium-zero . \
-  --create-namespace -n pomerium-zero \
+  -n pomerium-zero \
   --set pomeriumZeroToken=your-pomerium-zero-token
 ```
 
@@ -42,6 +42,7 @@ helm uninstall pomerium-zero -n pomerium-zero
 | Parameter | Description | Default |
 | --- | --- | --- |
 | `pomeriumZeroToken` | Pomerium Zero token (required) | `""` |
+| `createNamespace` | Create the target namespace | `true` |
 | `image.repository` | Image repository | `pomerium/pomerium` |
 | `image.tag` | Image tag (defaults to appVersion) | `""` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
@@ -59,7 +60,7 @@ Specify parameters using `--set key=value` or provide a YAML values file:
 
 ```sh
 helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
-  --create-namespace -n pomerium-zero -f values.yaml
+  -n pomerium-zero -f values.yaml
 ```
 
 ### Persistence
@@ -70,7 +71,7 @@ To disable persistence and use the legacy **Deployment** mode (bootstrap config 
 
 ```sh
 helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
-  --create-namespace -n pomerium-zero \
+  -n pomerium-zero \
   --set pomeriumZeroToken=your-token \
   --set persistence.enabled=false
 ```

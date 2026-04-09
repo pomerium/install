@@ -3,6 +3,9 @@
 # Required: Your Pomerium Zero token
 pomeriumZeroToken: "REPLACE_ME_WITH_YOUR_TOKEN"
 
+# Create the namespace if it doesn't exist
+createNamespace: true
+
 image:
   repository: pomerium/pomerium
   tag: ""
