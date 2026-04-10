@@ -1,0 +1,25 @@
+name: Helm Chart Tests
+on:
+  pull_request:
+    paths:
+      - "zero/helm/**"
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Install Helm CLI
+        uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 # v5.0.0
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+      - name: Lint
+        run: helm lint ./zero/helm
+      - name: Template (StatefulSet)
+        run: helm template pomerium-zero ./zero/helm --set pomeriumZeroToken=test-token
+      - name: Template (Deployment)
+        run: helm template pomerium-zero ./zero/helm --set pomeriumZeroToken=test-token --set persistence.enabled=false
+      - name: Unit Tests
+        run: ./zero/helm/tests/helm_test.sh

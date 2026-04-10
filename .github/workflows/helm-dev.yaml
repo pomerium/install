@@ -1,8 +1,10 @@
-name: Publish Helm Chart
+name: Publish Helm Chart (dev)
 on:
-  release:
-    types:
-      - published
+  push:
+    branches:
+      - main
+    paths:
+      - "zero/helm/**"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -11,6 +13,12 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Install Helm CLI
         uses: azure/setup-helm@dda3372f752e03dde6b3237bc9431cdc2f7a02a2 # v5.0.0
+      - name: Set dev version
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          VERSION="0.0.0-git.${SHORT_SHA}"
+          sed -i "s/^version:.*/version: ${VERSION}/" ./zero/helm/Chart.yaml
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
       - name: Login
         run: |
           helm registry login registry-1.docker.io --username="${{ secrets.DOCKERHUB_USER }}" --password="${{ secrets.DOCKERHUB_SECRET_1124 }}"

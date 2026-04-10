@@ -4,6 +4,7 @@ metadata:
   labels:
     {{- include "pomerium-zero.labels" . | nindent 4 }}
   name: pomerium-zero
+{{- if not .Values.persistence.enabled }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -35,3 +36,4 @@ subjects:
 - kind: ServiceAccount
   name: pomerium-zero
   namespace: {{ .Release.Namespace }}
+{{- end }}

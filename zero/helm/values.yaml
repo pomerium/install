@@ -3,6 +3,9 @@
 # Required: Your Pomerium Zero token
 pomeriumZeroToken: "REPLACE_ME_WITH_YOUR_TOKEN"
 
+# Create the namespace if it doesn't exist
+createNamespace: true
+
 image:
   repository: pomerium/pomerium
   tag: ""
@@ -28,6 +31,16 @@ resources:
 service:
   type: LoadBalancer
   port: 443
+
+# Persistence settings
+# When enabled, uses a StatefulSet with a PVC for persistent databroker and bootstrap storage.
+# When disabled, uses a Deployment with bootstrap config stored in a Kubernetes Secret.
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 1Gi
+  accessModes:
+    - ReadWriteOnce
 
 # Optional deployment settings
 #

@@ -10,62 +10,118 @@ This Helm chart deploys Pomerium Zero, an identity-aware access proxy, on a Kube
 
 ## Installing the Chart
 
-`helm install my-release oci://docker.io/pomerium/pomerium-zero --set pomeriumZeroToken=your-pomerium-zero-token`
+### From OCI Registry
+
+```sh
+helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
+  -n pomerium-zero \
+  --set pomeriumZeroToken=your-pomerium-zero-token
+```
+
+### From Source
+
+```sh
+git clone https://github.com/pomerium/install.git
+cd install/zero/helm
+
+helm install pomerium-zero . \
+  -n pomerium-zero \
+  --set pomeriumZeroToken=your-pomerium-zero-token
+```
 
 **Note:** Replace `your-pomerium-zero-token` with your actual Pomerium Zero token.
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `my-release` deployment:
-
-`helm uninstall my-release`
+```sh
+helm uninstall pomerium-zero -n pomerium-zero
+```
 
 ## Configuration
 
-The following table lists the configurable parameters of the Pomerium Zero chart and their default values.
+| Parameter | Description | Default |
+| --- | --- | --- |
+| `pomeriumZeroToken` | Pomerium Zero token (required) | `""` |
+| `createNamespace` | Create the target namespace | `true` |
+| `image.repository` | Image repository | `pomerium/pomerium` |
+| `image.tag` | Image tag (defaults to appVersion) | `""` |
+| `image.pullPolicy` | Image pull policy | `IfNotPresent` |
+| `replicaCount` | Number of replicas | `1` |
+| `resources` | CPU/Memory resource requests/limits | `{}` |
+| `service.type` | Service type | `LoadBalancer` |
+| `service.port` | Service port | `443` |
+| `service.nodePort` | NodePort (when service.type is NodePort) | |
+| `persistence.enabled` | Use StatefulSet with PVC for persistent storage | `true` |
+| `persistence.storageClass` | Storage class (empty uses cluster default) | `""` |
+| `persistence.size` | PVC size | `1Gi` |
+| `persistence.accessModes` | PVC access modes | `[ReadWriteOnce]` |
 
-| Parameter           | Description                         | Default             |
-| ------------------- | ----------------------------------- | ------------------- |
-| `pomeriumZeroToken` | Pomerium Zero token (required)      | `""`                |
-| `image.repository`  | Image repository                    | `pomerium/pomerium` |
-| `image.tag`         | Image tag                           | `v0.30.0`           |
-| `image.pullPolicy`  | Image pull policy                   | `IfNotPresent`      |
-| `replicaCount`      | Number of replicas                  | `1`                 |
-| `resources`         | CPU/Memory resource requests/limits | `{}`                |
-| `service.type`      | Service type                        | `ClusterIP`         |
-| `service.port`      | Service port                        | `443`               |
+Specify parameters using `--set key=value` or provide a YAML values file:
 
-Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example:
+```sh
+helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
+  -n pomerium-zero -f values.yaml
+```
 
-`helm install my-release oci://docker.io/pomerium/pomerium-zero --set pomeriumZeroToken=your-pomerium-zero-token,replicaCount=2`
+### Persistence
 
-Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
+By default, the chart deploys a **StatefulSet** with a PersistentVolumeClaim for databroker state and bootstrap configuration. This means data survives pod restarts without requiring RBAC permissions to write back to Kubernetes Secrets.
 
-`helm install my-release oci://docker.io/pomerium/pomerium-zero -f values.yaml`
+To disable persistence and use the legacy **Deployment** mode (bootstrap config stored in a Kubernetes Secret):
+
+```sh
+helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
+  -n pomerium-zero \
+  --set pomeriumZeroToken=your-token \
+  --set persistence.enabled=false
+```
 
 ## Upgrading the Chart
 
-To upgrade the `my-release` deployment:
-
-`helm upgrade my-release oci://docker.io/pomerium/pomerium-zero --set pomeriumZeroToken=your-pomerium-zero-token`
+```sh
+helm upgrade pomerium-zero oci://docker.io/pomerium/pomerium-zero \
+  -n pomerium-zero \
+  --set pomeriumZeroToken=your-pomerium-zero-token
+```
 
 ## Exposing Pomerium Zero
 
 This Helm chart deploys Pomerium Zero with a LoadBalancer service type, making it externally accessible. This configuration is suitable for cloud environments that support LoadBalancer services.
 
-### Important Notes:
+### Important Notes
 
 1. **LoadBalancer IP**: After deployment, it may take a few minutes for the LoadBalancer IP to be assigned. You can check the status using:
 
-   ```
-   kubectl get svc -n <namespace> <release-name>
+   ```sh
+   kubectl get svc -n pomerium-zero
    ```
 
 2. **Firewall Rules**: Depending on your environment, you may need to configure firewall rules or security groups to allow traffic to the LoadBalancer.
 
 3. **Costs**: Be aware that using a LoadBalancer service may incur additional costs in cloud environments.
 
-Remember to properly secure your Pomerium Zero instance to ensure the safety of your applications and data.
+## Development
+
+### Prerequisites
+
+- [helm](https://helm.sh/docs/intro/install/)
+- [yq](https://github.com/mikefarah/yq)
+
+### Testing
+
+```sh
+make test
+```
+
+### Makefile Targets
+
+| Target | Description |
+| --- | --- |
+| `make lint` | Run `helm lint` |
+| `make test` | Lint + run unit tests |
+| `make template` | Render templates (StatefulSet mode) |
+| `make template-deployment` | Render templates (Deployment mode) |
+| `make package` | Lint, test, and package chart |
 
 ## Support
 
