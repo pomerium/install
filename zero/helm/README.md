@@ -41,7 +41,9 @@ helm uninstall pomerium-zero -n pomerium-zero
 
 | Parameter | Description | Default |
 | --- | --- | --- |
-| `pomeriumZeroToken` | Pomerium Zero token (required) | `""` |
+| `pomeriumZeroToken` | Pomerium Zero token (required unless existingSecret is set) | `""` |
+| `existingSecret.name` | Use a pre-existing secret instead of creating one | `""` |
+| `existingSecret.key` | Key in the existing secret | `"pomerium_zero_token"` |
 | `createNamespace` | Create the target namespace | `true` |
 | `image.repository` | Image repository | `pomerium/pomerium` |
 | `image.tag` | Image tag (defaults to appVersion) | `""` |
