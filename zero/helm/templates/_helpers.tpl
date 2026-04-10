@@ -63,21 +63,10 @@ Validate required values
 Secret name for the token
 */}}
 {{- define "pomerium-zero.secretName" -}}
-{{- if .Values.existingSecret.name -}}
-{{- .Values.existingSecret.name -}}
+{{- with .Values.existingSecret.name -}}
+{{- . -}}
 {{- else -}}
 {{- include "pomerium-zero.fullname" . -}}
-{{- end -}}
-{{- end -}}
-
-{{/*
-Secret key for the token
-*/}}
-{{- define "pomerium-zero.secretKey" -}}
-{{- if .Values.existingSecret.name -}}
-{{- .Values.existingSecret.key -}}
-{{- else -}}
-pomerium_zero_token
 {{- end -}}
 {{- end -}}
 
@@ -97,7 +86,7 @@ containers:
         valueFrom:
           secretKeyRef:
             name: {{ include "pomerium-zero.secretName" . }}
-            key: {{ include "pomerium-zero.secretKey" . }}
+            key: {{ .Values.existingSecret.key }}
       - name: POMERIUM_NAMESPACE
         valueFrom:
           fieldRef:
