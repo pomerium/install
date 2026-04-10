@@ -1,7 +1,12 @@
 # Default values for pomerium-zero Helm chart
 
 # Required: Your Pomerium Zero token
+# Set pomeriumZeroToken to have the chart create and manage the secret,
+# or set existingSecret to reference a pre-existing secret.
 pomeriumZeroToken: "REPLACE_ME_WITH_YOUR_TOKEN"
+existingSecret:
+  name: ""
+  key: "pomerium_zero_token"
 
 # Create the namespace if it doesn't exist
 createNamespace: true

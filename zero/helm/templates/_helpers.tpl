@@ -54,8 +54,19 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Validate required values
 */}}
 {{- define "pomerium-zero.validateValues" -}}
-{{- if not .Values.pomeriumZeroToken -}}
-{{- fail "pomeriumZeroToken is required. Please set it in your values.yaml or provide it via --set flag." -}}
+{{- if and (not .Values.existingSecret.name) (not .Values.pomeriumZeroToken) -}}
+{{- fail "pomeriumZeroToken or existingSecret.name is required." -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Secret name for the token
+*/}}
+{{- define "pomerium-zero.secretName" -}}
+{{- with .Values.existingSecret.name -}}
+{{- . -}}
+{{- else -}}
+{{- include "pomerium-zero.fullname" . -}}
 {{- end -}}
 {{- end -}}
 
@@ -74,8 +85,8 @@ containers:
       - name: POMERIUM_ZERO_TOKEN
         valueFrom:
           secretKeyRef:
-            name: {{ include "pomerium-zero.fullname" . }}
-            key: pomerium_zero_token
+            name: {{ include "pomerium-zero.secretName" . }}
+            key: {{ .Values.existingSecret.key }}
       - name: POMERIUM_NAMESPACE
         valueFrom:
           fieldRef:
@@ -100,7 +111,7 @@ containers:
       - name: BOOTSTRAP_CONFIG_FILE
         value: "/var/run/secrets/pomerium/bootstrap.dat"
       - name: BOOTSTRAP_CONFIG_WRITEBACK_URI
-        value: "secret://$(POMERIUM_NAMESPACE)/{{ include "pomerium-zero.fullname" . }}/bootstrap"
+        value: "secret://$(POMERIUM_NAMESPACE)/{{ include "pomerium-zero.secretName" . }}/bootstrap"
       - name: XDG_CACHE_HOME
         value: /tmp/pomerium/cache
       - name: XDG_DATA_HOME
@@ -192,7 +203,7 @@ volumes:
       - key: bootstrap
         path: bootstrap.dat
       optional: true
-      secretName: {{ include "pomerium-zero.fullname" . }}
+      secretName: {{ include "pomerium-zero.secretName" . }}
   {{- end }}
   {{- with .Values.extraVolumes }}
   {{- toYaml . | nindent 2 }}

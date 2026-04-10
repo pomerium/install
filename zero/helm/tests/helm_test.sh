@@ -156,15 +156,45 @@ assert_eq "no Namespace when createNamespace=false" "$(echo "$ns" | yq '.kind')"
 
 echo ""
 
+# ─── Existing Secret ──────────────────────────────────────────────────
+
+echo "Suite: Existing Secret"
+
+out="$(helm template test "$CHART_DIR" --set existingSecret.name=my-secret --set existingSecret.key=my-key 2>&1)"
+
+# No Secret resource should be rendered
+assert_eq "no Secret rendered" "$(select_kind "$out" "Secret" | yq '.kind')" "null"
+
+# secretKeyRef should point to the existing secret
+ss="$(select_kind "$out" "StatefulSet")"
+container="$(echo "$ss" | yq '.spec.template.spec.containers[0]')"
+assert_contains "secretRef name is my-secret" "$container" "name: my-secret"
+assert_contains "secretRef key is my-key" "$container" "key: my-key"
+
+# Default mode should still create a Secret
+out="$(render)"
+secret="$(select_kind "$out" "Secret")"
+assert_eq "Secret rendered by default" "$(echo "$secret" | yq '.kind')" "Secret"
+
+echo ""
+
 # ─── Validation ──────────────────────────────────────────────────────
 
 echo "Suite: Validation"
 
 validation_output="$(helm template test "$CHART_DIR" --set 'pomeriumZeroToken=' 2>&1 || true)"
-if echo "$validation_output" | grep -q "pomeriumZeroToken is required"; then
-  pass "fails when token is empty"
+if echo "$validation_output" | grep -q "pomeriumZeroToken or existingSecret.name is required"; then
+  pass "fails when neither token nor existingSecret set"
 else
-  fail "fails when token is empty" "expected validation error"
+  fail "fails when neither token nor existingSecret set" "expected validation error"
+fi
+
+# Should succeed with existingSecret alone
+validation_output="$(helm template test "$CHART_DIR" --set 'pomeriumZeroToken=' --set existingSecret.name=my-secret 2>&1 || true)"
+if echo "$validation_output" | grep -q "Error"; then
+  fail "succeeds with existingSecret.name" "expected no error"
+else
+  pass "succeeds with existingSecret.name"
 fi
 
 echo ""
