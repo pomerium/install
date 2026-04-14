@@ -127,6 +127,9 @@ containers:
       - containerPort: 9090
         name: metrics
         protocol: TCP
+      - containerPort: 28080
+        name: health
+        protocol: TCP
     volumeMounts:
       - name: tmp
         mountPath: /tmp
@@ -145,25 +148,31 @@ containers:
       {{- toYaml .Values.resources | nindent 6 }}
     securityContext:
       {{- toYaml .Values.securityContext | nindent 6 }}
-    livenessProbe:
-      httpGet:
-        path: /healthz
-        port: https
-        scheme: HTTPS
-      timeoutSeconds: 1
-      periodSeconds: 10
-      successThreshold: 1
-      failureThreshold: 3
     startupProbe:
       httpGet:
-        path: /healthz
-        port: https
-        scheme: HTTPS
+        path: /startupz
+        port: health
       initialDelaySeconds: 5
       timeoutSeconds: 1
       periodSeconds: 5
       successThreshold: 1
       failureThreshold: 60
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: health
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: health
+      timeoutSeconds: 1
+      periodSeconds: 10
+      successThreshold: 1
+      failureThreshold: 3
   {{- with .Values.extraContainers }}
   {{ toYaml . | nindent 2 }}
   {{- end }}
