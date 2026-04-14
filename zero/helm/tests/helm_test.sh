@@ -156,6 +156,20 @@ assert_eq "no Namespace when createNamespace=false" "$(echo "$ns" | yq '.kind')"
 
 echo ""
 
+# ─── ServiceAccount annotations ──────────────────────────────────────
+
+echo "Suite: ServiceAccount annotations"
+
+out="$(render --set 'serviceAccount.annotations.iam\.gke\.io/gcp-service-account=my-gsa@proj.iam.gserviceaccount.com')"
+sa="$(select_kind "$out" "ServiceAccount")"
+assert_contains "SA has workload identity annotation" "$sa" "iam.gke.io/gcp-service-account"
+
+out="$(render)"
+sa="$(select_kind "$out" "ServiceAccount")"
+assert_not_contains "SA has no annotations by default" "$sa" "annotations:"
+
+echo ""
+
 # ─── Existing Secret ──────────────────────────────────────────────────
 
 echo "Suite: Existing Secret"

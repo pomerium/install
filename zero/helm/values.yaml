@@ -16,6 +16,9 @@ image:
   tag: ""
   pullPolicy: IfNotPresent
 
+serviceAccount:
+  annotations: {}
+
 imagePullSecrets: []
 
 replicaCount: 1

@@ -45,6 +45,7 @@ helm uninstall pomerium-zero -n pomerium-zero
 | `existingSecret.name` | Use a pre-existing secret instead of creating one | `""` |
 | `existingSecret.key` | Key in the existing secret | `"pomerium_zero_token"` |
 | `createNamespace` | Create the target namespace | `true` |
+| `serviceAccount.annotations` | Annotations for the ServiceAccount (e.g. workload identity) | `{}` |
 | `image.repository` | Image repository | `pomerium/pomerium` |
 | `image.tag` | Image tag (defaults to appVersion) | `""` |
 | `image.pullPolicy` | Image pull policy | `IfNotPresent` |
