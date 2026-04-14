@@ -50,6 +50,10 @@ persistence:
   accessModes:
     - ReadWriteOnce
 
+# Health probes (disabled by default — health endpoint binds to 127.0.0.1)
+probes:
+  enabled: false
+
 # Optional deployment settings
 #
 extraEnvVars: {}
