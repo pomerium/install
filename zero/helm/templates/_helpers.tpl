@@ -148,6 +148,7 @@ containers:
       {{- toYaml .Values.resources | nindent 6 }}
     securityContext:
       {{- toYaml .Values.securityContext | nindent 6 }}
+    {{- if .Values.probes.enabled }}
     startupProbe:
       httpGet:
         path: /startupz
@@ -173,6 +174,7 @@ containers:
       periodSeconds: 10
       successThreshold: 1
       failureThreshold: 3
+    {{- end }}
   {{- with .Values.extraContainers }}
   {{ toYaml . | nindent 2 }}
   {{- end }}
