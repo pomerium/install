@@ -63,6 +63,7 @@ initContainers: {}
 #
 # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod
 podSecurityContext:
+  fsGroup: 65532
   runAsNonRoot: true
   runAsGroup: 65532
   runAsUser: 65532
