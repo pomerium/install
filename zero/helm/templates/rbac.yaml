@@ -3,6 +3,10 @@ kind: ServiceAccount
 metadata:
   labels:
     {{- include "pomerium-zero.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   name: pomerium-zero
 {{- if not .Values.persistence.enabled }}
 ---
