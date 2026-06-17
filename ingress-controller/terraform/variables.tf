@@ -11,6 +11,12 @@ variable "use_external_namespace" {
   default     = false
 }
 
+variable "install_crds" {
+  description = "Install the pomerium CRDs. Set to false when the cluster-scoped CRDs are owned by a separate installer (e.g. a dedicated ArgoCD CRD application) to avoid fighting over the CRD schema."
+  type        = bool
+  default     = true
+}
+
 variable "labels" {
   description = "Labels to apply to resources"
   type        = map(string)
