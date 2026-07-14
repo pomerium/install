@@ -222,3 +222,9 @@ variable "disable_remote_diagnostics" {
   type        = bool
   default     = false
 }
+
+variable "session_recording_options" {
+  description = "Bootstrap settings (JSON) for session_recording for the default cluster. `datasource_name` (the string id for this datasource) and `bucket_uri` (the storage configuration) must be set. See https://www.pomerium.com/docs/capabilities/session-recording/storage for more details"
+  type        = string
+  default     = ""
+}

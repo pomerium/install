@@ -167,6 +167,11 @@ resource "kubernetes_deployment" "pomerium-console" {
           }
 
           env {
+            name  = "SESSION_RECORDING_OPTIONS"
+            value = var.session_recording_options
+          }
+
+          env {
             name  = "TMPDIR"
             value = "/tmp"
           }
