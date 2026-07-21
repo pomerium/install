@@ -6,8 +6,14 @@ resource "kubernetes_cluster_role" "controller" {
 
   rule {
     api_groups = [""]
-    resources  = ["services", "endpoints", "secrets"]
+    resources  = ["services", "endpoints"]
     verbs      = ["get", "list", "watch"]
+  }
+
+  rule {
+    api_groups = [""]
+    resources  = ["secrets"]
+    verbs      = ["delete", "get", "list", "watch", "patch"]
   }
 
   rule {
@@ -19,7 +25,7 @@ resource "kubernetes_cluster_role" "controller" {
   rule {
     api_groups = ["networking.k8s.io"]
     resources  = ["ingresses", "ingressclasses"]
-    verbs      = ["get", "list", "watch"]
+    verbs      = ["get", "list", "watch", "patch"]
   }
 
   rule {
@@ -44,5 +50,11 @@ resource "kubernetes_cluster_role" "controller" {
     api_groups = [""]
     resources  = ["events"]
     verbs      = ["create", "patch"]
+  }
+
+  rule {
+    api_groups = ["cert-manager.io"]
+    resources  = ["certificates"]
+    verbs      = ["create", "delete", "get", "list", "patch", "watch", "update"]
   }
 }
