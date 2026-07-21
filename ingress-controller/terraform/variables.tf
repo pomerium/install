@@ -217,11 +217,17 @@ variable "config" {
   description = "Pomerium configuration. Set to null to disable config creation. See https://www.pomerium.com/docs/k8s/reference"
   type = object({
     accessLogFields = optional(list(string))
+    allowUpgrades   = optional(list(string))
     authenticate = optional(object({
-      callbackPath = optional(string)
-      url          = string
+      url = string
     }))
-    caSecrets    = optional(list(string))
+    authorizeLogFields = optional(list(string))
+    bearerTokenFormat  = optional(string) # one of: default, idp_access_token, idp_identity_token
+    caSecrets          = optional(list(string))
+    certificateAutoProvision = optional(object({
+      clusterIssuer = optional(string)
+      issuer        = optional(string)
+    }))
     certificates = optional(list(string))
     circuitBreakerThresholds = optional(object({
       maxConnectionPools = optional(number)
@@ -230,12 +236,25 @@ variable "config" {
       maxRequests        = optional(number)
       maxRetries         = optional(number)
     }))
+    codecType = optional(string) # one of: auto, http1, http2, http3
     cookie = optional(object({
       domain   = optional(string)
       expire   = optional(string)
       httpOnly = optional(bool)
       name     = optional(string)
       sameSite = optional(string)
+    }))
+    dataBroker = optional(object({
+      clusterLeaderId = optional(string)
+    }))
+    dns = optional(object({
+      failureRefreshRate = optional(string)
+      lookupFamily       = optional(string)
+      queryTimeout       = optional(string)
+      queryTries         = optional(number)
+      refreshRate        = optional(string)
+      udpMaxQueries      = optional(number)
+      useTcp             = optional(bool)
     }))
     downstreamMtls = optional(object({
       ca          = optional(string)
@@ -250,6 +269,7 @@ variable "config" {
       }))
       maxVerifyDepth = optional(number)
     }))
+    envoyDynamicExtensions = optional(list(string))
     identityProvider = optional(object({
       provider            = string
       requestParams       = optional(map(string))
@@ -258,34 +278,38 @@ variable "config" {
       secret              = string
       url                 = optional(string)
     }))
-    jwtClaimHeaders = optional(map(string))
+    idpAccessTokenAllowedAudiences = optional(list(string))
+    jwtClaimHeaders                = optional(map(string))
+    mcpAllowedAsMetadataDomains    = optional(list(string))
+    mcpAllowedClientIdDomains      = optional(list(string))
     otel = optional(object({
       endpoint              = string # required
       protocol              = string # required
       headers               = optional(map(string))
       timeout               = optional(string)
-      sampling              = optional(number)
+      sampling              = optional(string)
       resourceAttributes    = optional(map(string))
       bspScheduleDelay      = optional(string)
       bspMaxExportBatchSize = optional(number)
       logLevel              = optional(string)
     }))
     passIdentityHeaders         = optional(bool)
-    programmaticRedirectDomains = optional(string)
+    programmaticRedirectDomains = optional(list(string))
     runtimeFlags                = optional(map(bool))
+    setResponseHeaders          = optional(map(string))
     ssh = optional(object({
       hostKeySecrets  = optional(list(string))
       userCaKeySecret = optional(string)
     }))
     storage = optional(object({
-      file = object({
+      file = optional(object({
         path = optional(string)
-      })
-      postgres = object({
+      }))
+      postgres = optional(object({
         caSecret  = optional(string)
         secret    = string
         tlsSecret = optional(string)
-      })
+      }))
     }))
     timeouts = optional(object({
       idle  = optional(string)
