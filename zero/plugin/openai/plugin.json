@@ -1,0 +1,90 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "pomerium-zero",
+  "version": "1.0.0",
+  "description": "Manage Pomerium Zero routes, policies, service accounts, and cluster settings through the hosted Pomerium Zero MCP server.",
+  "author": {
+    "name": "Pomerium, Inc.",
+    "email": "support@pomerium.com",
+    "url": "https://www.pomerium.com"
+  },
+  "homepage": "https://github.com/pomerium/install/tree/main/zero/plugin/claude#readme",
+  "repository": "https://github.com/pomerium/install",
+  "license": "Apache-2.0",
+  "keywords": ["pomerium", "zero-trust", "access-control", "identity-aware-proxy", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Pomerium Zero",
+        "shortDescription": "Manage routes and policies",
+        "longDescription": "Review and change the configuration of your Pomerium Zero clusters: routes, policies, service accounts, and cluster settings. Pomerium Zero is the hosted control plane for Pomerium's identity-aware proxy. The plugin is for administrators of a Pomerium Zero organization. It acts with the permissions of the signed-in Pomerium Zero account and can only see organizations and clusters that account can access. Uploading or replacing TLS key pairs isn't supported; use the Pomerium Zero console for those.",
+        "developerName": "Pomerium, Inc.",
+        "category": "Developer Tools",
+        "capabilities": ["Read", "Write"],
+        "websiteURL": "https://www.pomerium.com/",
+        "supportURL": "https://www.pomerium.com/contact",
+        "privacyPolicyURL": "https://www.pomerium.com/privacy-policy",
+        "termsOfServiceURL": "https://www.pomerium.com/zero-terms-and-conditions",
+        "defaultPrompt": [
+          "Which Pomerium Zero clusters can I access?",
+          "List the routes in my cluster and the policy attached to each one.",
+          "Create a route named grafana that sends traffic to http://grafana.internal:3000."
+        ],
+        "brandColor": "#7C3AED",
+        "composerIcon": "./assets/composer-icon.png",
+        "logo": "./assets/logo.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "List accessible organizations and clusters",
+              "prompt": "Which Pomerium Zero organizations and clusters can I access?",
+              "tools_triggered": "list_organizations, list_clusters",
+              "expected_behavior": "Lists the organizations and clusters in the reviewer account by name, without changing anything."
+            },
+            {
+              "description": "List routes in a cluster",
+              "prompt": "Show me the routes in my Pomerium Zero cluster.",
+              "tools_triggered": "list_clusters, list_routes",
+              "expected_behavior": "Returns each route in the reviewer cluster with its name, from URL, and to URL."
+            },
+            {
+              "description": "Explain policies",
+              "prompt": "What policies are configured in my Pomerium Zero cluster, and who does each one allow?",
+              "tools_triggered": "list_clusters, list_policies",
+              "expected_behavior": "Lists the cluster's policies and summarizes who each one allows, based on the policy definitions the tool returns."
+            },
+            {
+              "description": "Create a route",
+              "prompt": "In my Pomerium Zero cluster, create a route named review-demo that sends traffic to https://example.com.",
+              "tools_triggered": "list_clusters, create_route",
+              "expected_behavior": "Creates the route in the reviewer cluster, asking for a from URL if one is needed, and returns the created route."
+            },
+            {
+              "description": "Delete a route",
+              "prompt": "Delete the review-demo route from my Pomerium Zero cluster.",
+              "tools_triggered": "list_clusters, list_routes, delete_route",
+              "expected_behavior": "Finds the review-demo route, asks for confirmation before deleting it, deletes it, and confirms it no longer appears in the route list."
+            }
+          ],
+          "negative": [
+            {
+              "description": "Unrelated request",
+              "prompt": "What's the weather in Paris today?"
+            },
+            {
+              "description": "Key pair upload isn't supported",
+              "prompt": "Upload this TLS certificate and private key to my Pomerium Zero cluster."
+            },
+            {
+              "description": "Cluster outside the connected account",
+              "prompt": "Show me the routes in a Pomerium Zero cluster that belongs to another company."
+            }
+          ]
+        },
+        "commerce": false
+      }
+    }
+  }
+}

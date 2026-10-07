@@ -1,0 +1,12 @@
+version: 2
+updates:
+  # Pinned validators for the Zero plugin bundles (zero/plugin/README.md),
+  # grouped into one PR that the Zero Plugin workflow checks.
+  - package-ecosystem: "npm"
+    directory: "/zero/plugin/tools"
+    schedule:
+      interval: "weekly"
+    groups:
+      zero-plugin-tools:
+        patterns:
+          - "*"

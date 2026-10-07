@@ -1,0 +1,20 @@
+{
+  "name": "pomerium-zero",
+  "displayName": "Pomerium Zero",
+  "version": "1.0.0",
+  "description": "Manage Pomerium Zero routes, policies, service accounts, and cluster settings through the hosted Pomerium Zero MCP server.",
+  "author": {
+    "name": "Pomerium, Inc.",
+    "email": "support@pomerium.com",
+    "url": "https://www.pomerium.com"
+  },
+  "homepage": "https://github.com/pomerium/install/tree/main/zero/plugin/claude#readme",
+  "repository": "https://github.com/pomerium/install",
+  "license": "Apache-2.0",
+  "keywords": ["pomerium", "zero-trust", "access-control", "identity-aware-proxy", "mcp"],
+  "icon": "./assets/logo.png",
+  "documentationUrl": "https://github.com/pomerium/install/tree/main/zero/plugin/claude#readme",
+  "supportUrl": "https://www.pomerium.com/contact",
+  "privacyPolicyUrl": "https://www.pomerium.com/privacy-policy",
+  "termsOfServiceUrl": "https://www.pomerium.com/zero-terms-and-conditions"
+}
