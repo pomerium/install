@@ -148,7 +148,14 @@ containers:
       {{- toYaml .Values.resources | nindent 6 }}
     securityContext:
       {{- toYaml .Values.securityContext | nindent 6 }}
-    {{- if .Values.probes.enabled }}
+    {{- with .Values.lifecycle }}
+    lifecycle:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+    {{- if .Values.probes.startupProbe }}
+    startupProbe:
+      {{- toYaml .Values.probes.startupProbe | nindent 6 }}
+    {{- else if .Values.probes.enabled }}
     startupProbe:
       httpGet:
         path: /startupz
@@ -158,6 +165,11 @@ containers:
       periodSeconds: 5
       successThreshold: 1
       failureThreshold: 60
+    {{- end }}
+    {{- if .Values.probes.livenessProbe }}
+    livenessProbe:
+      {{- toYaml .Values.probes.livenessProbe | nindent 6 }}
+    {{- else if .Values.probes.enabled }}
     livenessProbe:
       httpGet:
         path: /healthz
@@ -166,6 +178,11 @@ containers:
       periodSeconds: 10
       successThreshold: 1
       failureThreshold: 3
+    {{- end }}
+    {{- if .Values.probes.readinessProbe }}
+    readinessProbe:
+      {{- toYaml .Values.probes.readinessProbe | nindent 6 }}
+    {{- else if .Values.probes.enabled }}
     readinessProbe:
       httpGet:
         path: /readyz
@@ -190,6 +207,10 @@ nodeSelector:
 affinity:
   {{- toYaml . | nindent 2 }}
 {{- end }}
+{{- with .Values.topologySpreadConstraints }}
+topologySpreadConstraints:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
 {{- with .Values.tolerations }}
 tolerations:
   {{- toYaml . | nindent 2 }}
@@ -203,6 +224,9 @@ priorityClassName: {{ .Values.priorityClassName | quote }}
 {{- end }}
 {{- if .Values.runtimeClassName }}
 runtimeClassName: {{ .Values.runtimeClassName | quote }}
+{{- end }}
+{{- if .Values.terminationGracePeriodSeconds }}
+terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
 {{- end }}
 volumes:
   - name: tmp

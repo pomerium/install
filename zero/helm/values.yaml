@@ -50,9 +50,29 @@ persistence:
   accessModes:
     - ReadWriteOnce
 
-# Health probes (disabled by default — health endpoint binds to 127.0.0.1)
+# Health probes
+#
+# probes.enabled renders HTTP probes against the health server on the pod IP. In Zero
+# mode Pomerium binds that server to 127.0.0.1:28080, so these probes fail until the
+# address is configurable. Exec probes that run `pomerium health` inside the container
+# work today; see "Health probes" in the README.
+#
+# A probe set below replaces the corresponding default and is rendered even when
+# probes.enabled is false.
 probes:
   enabled: false
+  startupProbe: {}
+  livenessProbe: {}
+  readinessProbe: {}
+
+# Rollout and shutdown settings
+#
+# https://kubernetes.io/docs/concepts/containers/container-lifecycle-hooks/
+lifecycle: {}
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-termination
+terminationGracePeriodSeconds: null
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#min-ready-seconds
+minReadySeconds: 0
 
 # Optional deployment settings
 #
@@ -92,6 +112,8 @@ podDisruptionBudget: {}
 #
 # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 affinity: {}
+# https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+topologySpreadConstraints: []
 # https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector
 nodeSelector:
   kubernetes.io/os: linux
