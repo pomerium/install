@@ -58,6 +58,14 @@ helm uninstall pomerium-zero -n pomerium-zero
 | `persistence.storageClass` | Storage class (empty uses cluster default) | `""` |
 | `persistence.size` | PVC size | `1Gi` |
 | `persistence.accessModes` | PVC access modes | `[ReadWriteOnce]` |
+| `probes.enabled` | Render the default HTTP probes (they fail in Zero mode, see [Health probes](#health-probes)) | `false` |
+| `probes.startupProbe` | Startup probe that replaces the default; rendered even when `probes.enabled` is false | `{}` |
+| `probes.livenessProbe` | Liveness probe that replaces the default; rendered even when `probes.enabled` is false | `{}` |
+| `probes.readinessProbe` | Readiness probe that replaces the default; rendered even when `probes.enabled` is false | `{}` |
+| `lifecycle` | Container lifecycle hooks, e.g. a `preStop` sleep | `{}` |
+| `terminationGracePeriodSeconds` | Pod termination grace period | Kubernetes default |
+| `minReadySeconds` | Seconds a new pod must stay ready before it counts as available | `0` |
+| `topologySpreadConstraints` | Pod topology spread constraints | `[]` |
 
 Specify parameters using `--set key=value` or provide a YAML values file:
 
@@ -77,6 +85,43 @@ helm install pomerium-zero oci://docker.io/pomerium/pomerium-zero \
   -n pomerium-zero \
   --set pomeriumZeroToken=your-token \
   --set persistence.enabled=false
+```
+
+### Health probes
+
+Pomerium serves `/startupz`, `/healthz` and `/readyz` on its health server. In Zero mode that server listens on `127.0.0.1:28080` and the address can't be changed yet, so the kubelet can't reach the default HTTP probes (`probes.enabled`). Until it can, run the probe inside the container with `pomerium health`, which reads `/status` from the local health server:
+
+```yaml
+probes:
+  readinessProbe:
+    exec:
+      command:
+        - /bin/pomerium
+        - health
+        - -e
+        - zero.bootstrap-config.save
+        - -e
+        - zero.connect
+        - -e
+        - zero.telemetry.collect-and-send
+        - -e
+        - routes.reachable
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    timeoutSeconds: 5
+    failureThreshold: 2
+```
+
+`pomerium health` fails on any reported check that isn't `RUNNING` or carries an error. The excluded checks are the ones the HTTP probes leave out as well. On clusters that cap service account token lifetime, `zero.bootstrap-config.save` reports an error once the token expires ([pomerium/pomerium#6842](https://github.com/pomerium/pomerium/issues/6842)). Add `-e storage.backend` if a short database outage shouldn't take every replica out of rotation at once.
+
+Behind a load balancer, combine the readiness probe with a `preStop` delay that is longer than the load balancer needs to stop sending new connections to a pod. The image has no `sleep` binary, so use the `sleep` action (Kubernetes 1.30+):
+
+```yaml
+lifecycle:
+  preStop:
+    sleep:
+      seconds: 30
+terminationGracePeriodSeconds: 60
 ```
 
 ## Upgrading the Chart

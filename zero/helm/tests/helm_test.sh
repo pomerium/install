@@ -114,6 +114,62 @@ assert_eq "RoleBinding rendered" "$(select_kind "$out" "RoleBinding" | yq '.kind
 
 echo ""
 
+# ─── Probes ──────────────────────────────────────────────────────────
+
+echo "Suite: Probes"
+
+out="$(render)"
+container="$(select_kind "$out" "StatefulSet" | yq '.spec.template.spec.containers[0]')"
+assert_not_contains "no probes by default" "$container" "Probe:"
+
+out="$(render --set probes.enabled=true)"
+container="$(select_kind "$out" "StatefulSet" | yq '.spec.template.spec.containers[0]')"
+assert_eq "default startupProbe path" "$(echo "$container" | yq '.startupProbe.httpGet.path')" "/startupz"
+assert_eq "default livenessProbe path" "$(echo "$container" | yq '.livenessProbe.httpGet.path')" "/healthz"
+assert_eq "default readinessProbe path" "$(echo "$container" | yq '.readinessProbe.httpGet.path')" "/readyz"
+
+out="$(render --set persistence.enabled=false --set 'probes.readinessProbe.exec.command={/bin/pomerium,health}' --set probes.readinessProbe.periodSeconds=5)"
+container="$(select_kind "$out" "Deployment" | yq '.spec.template.spec.containers[0]')"
+assert_eq "readinessProbe override without probes.enabled" "$(echo "$container" | yq '.readinessProbe.exec.command[1]')" "health"
+assert_eq "readinessProbe override keeps its fields" "$(echo "$container" | yq '.readinessProbe.periodSeconds')" "5"
+assert_eq "no default startupProbe" "$(echo "$container" | yq '.startupProbe')" "null"
+assert_eq "no default livenessProbe" "$(echo "$container" | yq '.livenessProbe')" "null"
+
+out="$(render --set probes.enabled=true --set 'probes.livenessProbe.exec.command={/bin/pomerium,health}')"
+container="$(select_kind "$out" "StatefulSet" | yq '.spec.template.spec.containers[0]')"
+assert_eq "livenessProbe override replaces the default" "$(echo "$container" | yq '.livenessProbe.httpGet')" "null"
+assert_eq "other default probes kept" "$(echo "$container" | yq '.readinessProbe.httpGet.path')" "/readyz"
+
+echo ""
+
+# ─── Rollout and scheduling settings ─────────────────────────────────
+
+echo "Suite: Rollout and scheduling settings"
+
+out="$(render --set persistence.enabled=false)"
+dep="$(select_kind "$out" "Deployment")"
+assert_eq "no minReadySeconds by default" "$(echo "$dep" | yq '.spec.minReadySeconds')" "null"
+assert_eq "no terminationGracePeriodSeconds by default" "$(echo "$dep" | yq '.spec.template.spec.terminationGracePeriodSeconds')" "null"
+assert_eq "no lifecycle by default" "$(echo "$dep" | yq '.spec.template.spec.containers[0].lifecycle')" "null"
+assert_eq "no topologySpreadConstraints by default" "$(echo "$dep" | yq '.spec.template.spec.topologySpreadConstraints')" "null"
+
+out="$(render --set persistence.enabled=false --set minReadySeconds=30 --set terminationGracePeriodSeconds=60 \
+  --set lifecycle.preStop.sleep.seconds=30 \
+  --set 'topologySpreadConstraints[0].maxSkew=1' \
+  --set 'topologySpreadConstraints[0].topologyKey=topology.kubernetes.io/zone' \
+  --set 'topologySpreadConstraints[0].whenUnsatisfiable=DoNotSchedule')"
+dep="$(select_kind "$out" "Deployment")"
+assert_eq "minReadySeconds" "$(echo "$dep" | yq '.spec.minReadySeconds')" "30"
+assert_eq "terminationGracePeriodSeconds" "$(echo "$dep" | yq '.spec.template.spec.terminationGracePeriodSeconds')" "60"
+assert_eq "preStop sleep" "$(echo "$dep" | yq '.spec.template.spec.containers[0].lifecycle.preStop.sleep.seconds')" "30"
+assert_eq "topologySpreadConstraints key" "$(echo "$dep" | yq '.spec.template.spec.topologySpreadConstraints[0].topologyKey')" "topology.kubernetes.io/zone"
+
+out="$(render --set minReadySeconds=30)"
+ss="$(select_kind "$out" "StatefulSet")"
+assert_eq "StatefulSet minReadySeconds" "$(echo "$ss" | yq '.spec.minReadySeconds')" "30"
+
+echo ""
+
 # ─── Service ─────────────────────────────────────────────────────────
 
 echo "Suite: Service"

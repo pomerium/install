@@ -9,6 +9,9 @@ metadata:
 spec:
   serviceName: {{ include "pomerium-zero.fullname" . }}
   replicas: {{ .Values.replicaCount }}
+  {{- with .Values.minReadySeconds }}
+  minReadySeconds: {{ . }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "pomerium-zero.selectorLabels" . | nindent 6 }}

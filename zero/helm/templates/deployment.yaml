@@ -8,6 +8,9 @@ metadata:
     {{- include "pomerium-zero.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  {{- with .Values.minReadySeconds }}
+  minReadySeconds: {{ . }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "pomerium-zero.selectorLabels" . | nindent 6 }}
