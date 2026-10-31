@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "Requirements for an MCP plugin submission from https://developers.openai.com/plugins/deploy/submission. OpenAI publishes no schema for them, and the portal checks them again on upload.",
+  "type": "object",
+  "required": ["name", "version", "description", "author", "extensions"],
+  "properties": {
+    "name": { "type": "string", "maxLength": 64 },
+    "description": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "author": {
+      "type": "object",
+      "required": ["name"],
+      "properties": { "name": { "type": "string", "minLength": 1, "maxLength": 120 } }
+    },
+    "extensions": {
+      "type": "object",
+      "required": ["com.openai"],
+      "properties": {
+        "com.openai": {
+          "type": "object",
+          "required": ["interface", "review"],
+          "properties": {
+            "interface": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "shortDescription",
+                "longDescription",
+                "developerName",
+                "category",
+                "capabilities",
+                "websiteURL",
+                "supportURL",
+                "privacyPolicyURL",
+                "termsOfServiceURL",
+                "logo",
+                "composerIcon"
+              ],
+              "properties": {
+                "displayName": { "type": "string", "minLength": 1, "maxLength": 30 },
+                "shortDescription": { "type": "string", "minLength": 1, "maxLength": 30 },
+                "longDescription": { "type": "string", "minLength": 1, "maxLength": 4000 },
+                "developerName": { "type": "string", "minLength": 1, "maxLength": 80 },
+                "category": { "type": "string", "minLength": 1 },
+                "capabilities": {
+                  "type": "array",
+                  "maxItems": 20,
+                  "items": { "type": "string", "minLength": 1, "maxLength": 120 }
+                },
+                "websiteURL": { "$ref": "#/$defs/httpsURL" },
+                "supportURL": { "$ref": "#/$defs/httpsURL" },
+                "privacyPolicyURL": { "$ref": "#/$defs/httpsURL" },
+                "termsOfServiceURL": { "$ref": "#/$defs/httpsURL" },
+                "logo": { "$ref": "#/$defs/bundlePath" },
+                "logoDark": { "$ref": "#/$defs/bundlePath" },
+                "composerIcon": { "$ref": "#/$defs/bundlePath" },
+                "composerIconDark": { "$ref": "#/$defs/bundlePath" },
+                "screenshots": { "type": "array", "items": { "$ref": "#/$defs/bundlePath" } }
+              }
+            },
+            "review": {
+              "type": "object",
+              "required": ["test_cases"],
+              "properties": {
+                "test_cases": {
+                  "type": "object",
+                  "required": ["positive", "negative"],
+                  "properties": {
+                    "positive": {
+                      "type": "array",
+                      "minItems": 5,
+                      "maxItems": 5,
+                      "items": {
+                        "type": "object",
+                        "required": ["description", "prompt", "tools_triggered", "expected_behavior"],
+                        "properties": {
+                          "description": { "type": "string", "minLength": 1 },
+                          "prompt": { "type": "string", "minLength": 1 },
+                          "tools_triggered": { "type": "string", "minLength": 1 },
+                          "expected_behavior": { "type": "string", "minLength": 1 }
+                        }
+                      }
+                    },
+                    "negative": {
+                      "type": "array",
+                      "minItems": 3,
+                      "maxItems": 3,
+                      "items": {
+                        "type": "object",
+                        "required": ["description", "prompt"],
+                        "properties": {
+                          "description": { "type": "string", "minLength": 1 },
+                          "prompt": { "type": "string", "minLength": 1 }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "httpsURL": { "type": "string", "pattern": "^https://", "maxLength": 1024 },
+    "bundlePath": { "type": "string", "pattern": "^\\./(?!.*\\.\\./)" }
+  }
+}

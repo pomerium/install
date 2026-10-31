@@ -1,0 +1,12 @@
+{
+  "name": "pomerium-zero-plugin-tools",
+  "private": true,
+  "description": "Pinned validators for the Pomerium Zero plugin bundles. Upgraded by Dependabot; see ../README.md.",
+  "devDependencies": {
+    "@anthropic-ai/claude-code": "2.1.293",
+    "ajv": "8.20.0"
+  },
+  "allowScripts": {
+    "@anthropic-ai/claude-code": true
+  }
+}
