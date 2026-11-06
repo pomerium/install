@@ -28,29 +28,6 @@ variable "image_pull_policy" {
   default     = "IfNotPresent"
 }
 
-variable "image_pull_secret" {
-  description = "Name of the Docker registry secret"
-  type        = string
-  default     = "pomerium-enterprise-docker-registry"
-}
-
-variable "image_registry" {
-  description = "Image registry"
-  type        = string
-  default     = "docker.cloudsmith.io"
-}
-
-variable "image_registry_username" {
-  description = "Docker registry username"
-  type        = string
-  default     = "pomerium/enterprise"
-}
-
-variable "image_registry_password" {
-  description = "Docker registry password"
-  type        = string
-}
-
 variable "tolerations" {
   description = "List of tolerations for the pods."
   type = list(object({

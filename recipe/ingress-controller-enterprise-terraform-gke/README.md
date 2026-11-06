@@ -11,7 +11,6 @@ module "pomerium_enterprise_gke" {
   prefix                  = "prod"
   domain                  = "your wildcard domain name"
   license_key             = "pomerium enterprise license key"
-  image_registry_password = "pomerium enterprise registry password (provided by Pomerium Sales)"
   gcp_project             = "your GCP project ID"
   gcp_region              = "your GCP region, where the cluster is located"
   administrators          = ["admin@corp.com"]
