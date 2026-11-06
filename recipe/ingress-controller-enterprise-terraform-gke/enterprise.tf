@@ -30,9 +30,8 @@ module "pomerium_enterprise" {
 
   image_tag = var.pomerium_enterprise_image_tag
 
-  database_url            = local.enterprise_dsn
-  license_key             = var.license_key
-  image_registry_password = var.image_registry_password
+  database_url = local.enterprise_dsn
+  license_key  = var.license_key
 
   console_ingress     = local.console_ingress
   console_api_ingress = local.console_api_ingress

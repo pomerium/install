@@ -19,36 +19,13 @@ variable "image_name" {
 variable "image_tag" {
   description = "Container image tag"
   type        = string
-  default     = "v0.31.1"
+  default     = "v0.34.0"
 }
 
 variable "image_pull_policy" {
   description = "Image pull policy"
   type        = string
   default     = "IfNotPresent"
-}
-
-variable "image_pull_secret" {
-  description = "Name of the Docker registry secret"
-  type        = string
-  default     = "pomerium-enterprise-docker-registry"
-}
-
-variable "image_registry" {
-  description = "Image registry"
-  type        = string
-  default     = "docker.cloudsmith.io"
-}
-
-variable "image_registry_username" {
-  description = "Docker registry username"
-  type        = string
-  default     = "pomerium/enterprise"
-}
-
-variable "image_registry_password" {
-  description = "Docker registry password"
-  type        = string
 }
 
 variable "tolerations" {

@@ -7,7 +7,6 @@ resource "kubernetes_deployment" "pomerium-console" {
   depends_on = [
     kubernetes_namespace.pomerium-enterprise,
     kubernetes_secret.console,
-    kubernetes_secret.docker_registry,
     kubernetes_secret.console,
   ]
 
@@ -55,10 +54,6 @@ resource "kubernetes_deployment" "pomerium-console" {
           "kubernetes.io/os" = "linux"
         }
 
-        image_pull_secrets {
-          name = var.image_pull_secret
-        }
-
         volume {
           name = "tmp"
           empty_dir {
@@ -79,7 +74,7 @@ resource "kubernetes_deployment" "pomerium-console" {
 
         container {
           name              = "pomerium-console"
-          image             = "${var.image_registry}/${var.image_name}:${var.image_tag}"
+          image             = "pomerium/pomerium"
           image_pull_policy = var.image_pull_policy
 
           args = [

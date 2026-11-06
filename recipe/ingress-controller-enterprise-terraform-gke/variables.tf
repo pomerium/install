@@ -24,11 +24,6 @@ variable "administrators" {
   description = "The list of administrators for the enterprise installation"
 }
 
-variable "image_registry_password" {
-  type        = string
-  description = "The password for the image registry"
-}
-
 variable "db_tier" {
   type        = string
   description = "The tier of the database"
