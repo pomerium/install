@@ -2,8 +2,8 @@ apiVersion: v2
 name: pomerium-zero
 description: A Helm chart for deploying Pomerium Zero
 type: application
-version: 0.33.0
-appVersion: v0.33.0
+version: 0.34.0
+appVersion: v0.34.0
 home: https://www.pomerium.com/
 icon: https://www.pomerium.com/static-img/favicon.svg
 sources:
